@@ -1,0 +1,33 @@
+{:paths ["src" "resources"]
+ :deps
+ {org.clojure/clojure      {:mvn/version "1.10.2"}
+
+  ;; Data formats
+  org.clojure/data.json    {:mvn/version "1.0.0"}
+  lambdaisland/uri         {:mvn/version "1.4.54"}
+
+  ;; Http
+  hato/hato                {:mvn/version "0.8.0"}
+
+  ;; Logging
+  io.pedestal/pedestal.log {:mvn/version "0.5.8"}
+  }
+ :aliases
+ {:run-m {:main-opts ["-m" "co.gaiwan.clj-slack"]}
+  :run-x {:ns-default co.gaiwan.clj-slack
+          :exec-fn greet
+          :exec-args {:name "Clojure"}}
+  :test {:extra-paths ["test"]
+         :extra-deps {org.clojure/test.check {:mvn/version "1.1.0"}}}
+  :runner
+  {:extra-deps {com.cognitect/test-runner
+                {:git/url "https://github.com/cognitect-labs/test-runner"
+                 :sha "b6b3193fcc42659d7e46ecd1884a228993441182"}}
+   :main-opts ["-m" "cognitect.test-runner"
+               "-d" "test"]}
+  :uberjar {:replace-deps {seancorfield/depstar {:mvn/version "2.0.171"}}
+            :exec-fn hf.depstar/uberjar
+            :exec-args {:aot true
+                        :jar "clj-slack.jar"
+                        :main-class "co.gaiwan.clj-slack"
+                        :sync-pom true}}}}
