@@ -1,4 +1,4 @@
-(ns co.gaiwan.slack-request
+(ns co.gaiwan.core
   (:require [clojure.data.json :as json]
             [io.pedestal.log :as log]
             [hato.client :as http]
