@@ -19,19 +19,28 @@
 
 (defn wrap-paginate
   "Decorator for slack request functions which handles pagination
+
   Returns a lazy seq of the collection, or the response map if the first request
   fails. `k` is the key slack uses in the response to denote the result
   collection.
+
   When a non first request fails, the lazy seq of the collection before that
   request will be returned. If the error-logger in injected, the failed request's
   response will be record by the error-logger.
-  Note: error-logger can be nil if it is not needed."
+  Note: error-logger can be nil if it is not needed.
+
+  If the `opts` contains a limit parameter, just use it. If the `opts` does not
+  contain a limit parameter, assign the limit parameter as value 1000. The limit
+  parameter maximum is 1000 according to the document
+  https://api.slack.com/docs/pagination"
   [error-logger k f]
   (fn paginate
     ([conn]
      (paginate conn {}))
     ([conn opts]
-     (let [opts* (assoc opts :limit "100000")
+     (let [opts* (if (:limit opts)
+                   opts
+                   (assoc opts :limit 1000))
            resp (f conn opts*)
            lazy-f (fn lazy-f [{:keys [ok] :as resp}]
                     (if ok
