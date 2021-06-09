@@ -4,6 +4,7 @@
 
   ;; Data formats
   org.clojure/data.json    {:mvn/version "1.0.0"}
+  hiccup/hiccup            {:mvn/version "2.0.0-alpha2"}
   lambdaisland/uri         {:mvn/version "1.4.54"}
 
   ;; Http
