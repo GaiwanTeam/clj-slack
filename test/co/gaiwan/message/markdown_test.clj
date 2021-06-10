@@ -13,15 +13,15 @@
                "\n3. "
                [:del "strike"]
                "\n\norder test\na\nb"]]
-             (markdown/message->hiccup nil bold-italic-del nil)))
+             (markdown/message->hiccup bold-italic-del nil)))
       (is (= [:p
               (list "Hey "
                     [:span.username
-                     [:a {:href "https://xxx.slack.com/team/U4F2A0Z8ER"} "@" "John"]]
+                     [:a {:href "https://someteam.slack.com/team/U4F2A0Z8ER"} "@" "John"]]
                     " "
                     [:span.username
-                     [:a {:href "https://xxx.slack.com/team/U4F2A0Z9HR"} "@" "Marry"]])]
-             (markdown/message->hiccup "https://xxx.slack.com/team/" "Hey <@U4F2A0Z8ER> <@U4F2A0Z9HR>" {"U4F2A0Z8ER" "John" "U4F2A0Z9HR" "Marry"}))))))
+                     [:a {:href "https://someteam.slack.com/team/U4F2A0Z9HR"} "@" "Marry"]])]
+             (markdown/message->hiccup "Hey <@U4F2A0Z8ER> <@U4F2A0Z9HR>" {"U4F2A0Z8ER" "John" "U4F2A0Z9HR" "Marry"}))))))
 
 (deftest markdown-utilities
   (testing "extract-user-ids"

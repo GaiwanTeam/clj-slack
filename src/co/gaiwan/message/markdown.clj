@@ -79,69 +79,62 @@
 
 (defmulti segment->hiccup
   "Convert a single parsed segment of the form [type content] to hiccup."
-  (fn [_ segments]
-    (first segments)))
+  first)
 
-(defn segments->hiccup [slack-user-url segments]
+(defn segments->hiccup [segments]
   (cond
     (string? segments)
     segments
 
     (and (vector? segments) (keyword? (first segments)))
-    (segment->hiccup slack-user-url segments)
+    (segment->hiccup segments)
 
     (seqable? segments)
-    (map segment->hiccup (repeat slack-user-url) segments)
+    (map segment->hiccup segments)
 
     :else
     segments))
 
-(defmethod segment->hiccup :default [_ [type content]]
+(defmethod segment->hiccup :default [[type content]]
   content)
 
-(defmethod segment->hiccup :code-block [_ [type content]]
+(defmethod segment->hiccup :code-block [[type content]]
   [:pre.highlight [:code (hiccup/raw content)]])
 
-(defmethod segment->hiccup :inline-code [_ [type content]]
+(defmethod segment->hiccup :inline-code [[type content]]
   [:code (hiccup/raw content)])
 
-(defmethod segment->hiccup :user [slack-user-url [type content]]
-  [:span.username [:a (if slack-user-url
-                        {:href (str slack-user-url (:user-id content))}
-                        {})
+(defmethod segment->hiccup :user [[type content]]
+  ;; FIXME: don't hardcode this
+  [:span.username [:a {:href (str "https://someteam.slack.com/team/" (:user-id content))}
                    "@" (:user-name content)]])
 
-(defmethod segment->hiccup :channel-id [_ [type content name]]
+(defmethod segment->hiccup :channel-id [[type content name]]
   [:i "#" (if-not (empty? name)
             name
             content)])
 
-(defmethod segment->hiccup :emoji [_ [type content]]
+(defmethod segment->hiccup :emoji [[type content]]
   [:span.emoji content])
 
-(defmethod segment->hiccup :bold [slack-user-url [type content]]
-  [:b (segments->hiccup slack-user-url content)])
+(defmethod segment->hiccup :bold [[type content]]
+  [:b (segments->hiccup content)])
 
-(defmethod segment->hiccup :italic [slack-user-url [type content]]
-  [:i (segments->hiccup slack-user-url content)])
+(defmethod segment->hiccup :italic [[type content]]
+  [:i (segments->hiccup content)])
 
-(defmethod segment->hiccup :strike-through [slack-user-url [type content :as segment]]
-  [:del (segments->hiccup slack-user-url content)])
+(defmethod segment->hiccup :strike-through [[type content :as segment]]
+  [:del (segments->hiccup content)])
 
-(defmethod segment->hiccup :url [_ [type content]]
+(defmethod segment->hiccup :url [[type content]]
   [:a {:href content} content])
 
 (defn message->hiccup
-  "Parse slack markup and convert to hiccup.
-  
-   `slack-user-url` is typically of the form \"https://${org-name}.slack.com/team/\" 
-   When rendering user, there will be a link pointing to \"https://${org-name}.slack.com/team/{user-id}\"
-   When `slack-user-url`` is nil, this link will be disabled."
-  ([slack-user-url message usernames]
-   (message->hiccup slack-user-url message usernames {}))
-  ([slack-user-url message usernames emojis]
+  "Parse slack markup and convert to hiccup."
+  ([message usernames]
+   (message->hiccup message usernames {}))
+  ([message usernames emojis]
    [:p (segments->hiccup
-        slack-user-url
         (-> message
             (parser/parse2)
             (replace-ids-names usernames)
