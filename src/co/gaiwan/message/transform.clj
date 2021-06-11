@@ -27,7 +27,7 @@
 
 (defn- transform-emoji
   [content]
-  [:span.emoji content])
+  [:emoji content])
 
 (defn- transform-bold
   [content]

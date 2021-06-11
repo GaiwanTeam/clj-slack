@@ -59,8 +59,8 @@
   (map
    (fn [[type content :as token]]
      (if (= :emoji type)
-       [:emoji (or (text->emoji content emoji-map)
-                   (str ":" content ":"))]
+       [:span.emoji (or (text->emoji content emoji-map)
+                        (str ":" content ":"))]
        token))
    message))
 
