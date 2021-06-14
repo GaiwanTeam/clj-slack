@@ -2,8 +2,8 @@
   (:require [io.pedestal.log :as log]
             [co.gaiwan.slack.api.core :as clj-slack]))
 
-(def conn
-  (clj-slack/slack-conn "https://slack.com/api" "xoxb-1111111111111-222222222222-333333333333333333"))
+;; export environment variable SLACK_TOKEN
+(def conn (clj-slack/conn))
 
 (clj-slack/get-emoji conn)
 (clj-slack/get-channels conn)

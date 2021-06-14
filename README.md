@@ -20,8 +20,8 @@ This library requires Java 11.
 (ns slack-api
   (:require [co.gaiwan.clj-slack.core :as clj-slack]))
 
-(def conn
-  (clj-slack/slack-conn "https://slack.com/api" "xoxb-1111111111111-222222222222-333333333333333333"))
+;; export environment variable SLACK_TOKEN
+(def conn (clj-slack/conn))
 
 ;; Using the pre-decorated API to get all the emoji
 (clj-slack/get-emoji conn)

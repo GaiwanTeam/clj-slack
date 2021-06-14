@@ -1,15 +1,16 @@
 (ns co.gaiwan.slack.api.core
   (:require [io.pedestal.log :as log]
             [co.gaiwan.slack.api.middleware :as mw]
-            [co.gaiwan.slack.api.connection :as conn]))
+            [co.gaiwan.slack.api.web :as web]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
 
-
-(defn slack-conn [slack-api-url slack-bot-token]
-  {:api-url slack-api-url
-   :token slack-bot-token})
+(defn conn
+  ([]
+   (conn (System/getenv "SLACK_TOKEN")))
+  ([slack-token]
+   {:api-url "https://slack.com/api" :token slack-token}))
 
 (defn collection-endpoint
   [key endpoint]
@@ -21,7 +22,7 @@
       ([connection]
        (self connection {}))
       ([connection opt]
-       (conn/slack-request connection endpoint opt))))))
+       (web/slack-request connection endpoint opt))))))
 
 (def get-emoji (collection-endpoint :emoji "emoji.list"))
 (def get-users (collection-endpoint :members "users.list"))
@@ -48,4 +49,4 @@
                         (filter (comp #{name} :name_normalized))
                         first
                         :id)]
-    (conn/slack-request conn "conversations.join" {:channel channel-id})))
+    (web/slack-request conn "conversations.join" {:channel channel-id})))
