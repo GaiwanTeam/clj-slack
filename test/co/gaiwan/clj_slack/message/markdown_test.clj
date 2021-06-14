@@ -1,6 +1,6 @@
-(ns co.gaiwan.message.markdown-test
+(ns co.gaiwan.clj-slack.message.markdown-test
   (:require [clojure.test :refer :all]
-            [co.gaiwan.message.markdown :as markdown]))
+            [co.gaiwan.clj-slack.message.markdown :as markdown]))
 
 (deftest message->hiccup
   (testing "bold-italic-del"

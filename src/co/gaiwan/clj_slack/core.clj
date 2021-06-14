@@ -1,7 +1,7 @@
-(ns co.gaiwan.clj-slack
+(ns co.gaiwan.clj-slack.core
   (:require [io.pedestal.log :as log]
-            [co.gaiwan.middleware :as mw]
-            [co.gaiwan.core :as core])
+            [co.gaiwan.clj-slack.middleware :as mw]
+            [co.gaiwan.clj-slack.connection :as conn])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -20,7 +20,7 @@
       ([connection]
        (self connection {}))
       ([connection opt]
-       (core/slack-request connection endpoint opt))))))
+       (conn/slack-request connection endpoint opt))))))
 
 (def get-emoji (collection-endpoint :emoji "emoji.list"))
 (def get-users (collection-endpoint :members "users.list"))
@@ -47,4 +47,4 @@
                         (filter (comp #{name} :name_normalized))
                         first
                         :id)]
-    (core/slack-request conn "conversations.join" {:channel channel-id})))
+    (conn/slack-request conn "conversations.join" {:channel channel-id})))

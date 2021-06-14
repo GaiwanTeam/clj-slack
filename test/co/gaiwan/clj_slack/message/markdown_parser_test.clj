@@ -1,6 +1,6 @@
-(ns co.gaiwan.message.markdown-parser-test
+(ns co.gaiwan.clj-slack.message.markdown-parser-test
   (:require [clojure.test :refer :all]
-            [co.gaiwan.message.markdown-parser :as mp]))
+            [co.gaiwan.clj-slack.message.markdown-parser :as mp]))
 
 (deftest slack-advanced-markdown-test
   (testing "Unordered list"

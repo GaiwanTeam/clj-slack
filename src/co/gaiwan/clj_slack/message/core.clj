@@ -1,6 +1,6 @@
-(ns co.gaiwan.message.core
-  (:require [co.gaiwan.message.markdown-parser :as parser]
-            [co.gaiwan.message.transform :as transform]
+(ns co.gaiwan.clj-slack.message.core
+  (:require [co.gaiwan.clj-slack.message.markdown-parser :as parser]
+            [co.gaiwan.clj-slack.message.transform :as transform]
             [clojure.string :as str]
             [clojure.walk :as walk]
             [clojure.java.io :as io]

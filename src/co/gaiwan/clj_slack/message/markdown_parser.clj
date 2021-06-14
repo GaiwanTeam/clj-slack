@@ -1,4 +1,4 @@
-(ns co.gaiwan.message.markdown-parser
+(ns co.gaiwan.clj-slack.message.markdown-parser
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
