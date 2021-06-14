@@ -1,11 +1,12 @@
-(ns co.gaiwan.clj-slack.core
+(ns co.gaiwan.slack.api.core
   (:require [io.pedestal.log :as log]
-            [co.gaiwan.clj-slack.middleware :as mw]
-            [co.gaiwan.clj-slack.connection :as conn])
-  (:gen-class))
+            [co.gaiwan.slack.api.middleware :as mw]
+            [co.gaiwan.slack.api.connection :as conn]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
+
+
 (defn slack-conn [slack-api-url slack-bot-token]
   {:api-url slack-api-url
    :token slack-bot-token})

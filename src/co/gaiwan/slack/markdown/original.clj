@@ -1,5 +1,5 @@
-(ns co.gaiwan.clj-slack.message.markdown
-  (:require [co.gaiwan.clj-slack.message.markdown-parser :as parser]
+(ns co.gaiwan.slack.markdown.original
+  (:require [co.gaiwan.slack.markdown.parser :as parser]
             [clojure.string :as str]
             [clojure.walk :as walk]
             [hiccup2.core :as hiccup]

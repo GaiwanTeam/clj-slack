@@ -1,4 +1,4 @@
-(ns co.gaiwan.clj-slack.message.transform
+(ns co.gaiwan.slack.markdown.transform
   (:require [clojure.walk :as walk]
             [hiccup2.core :as hiccup]))
 

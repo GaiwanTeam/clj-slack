@@ -1,4 +1,4 @@
-(ns co.gaiwan.clj-slack.middleware)
+(ns co.gaiwan.slack.api.middleware)
 
 (defn wrap-rate-limit
   "Decorator for slack request functions which handles rate limiting.

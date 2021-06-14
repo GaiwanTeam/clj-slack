@@ -1,9 +1,8 @@
-(ns co.gaiwan.clj-slack.connection
+(ns co.gaiwan.slack.api.connection
   (:require [clojure.data.json :as json]
             [io.pedestal.log :as log]
             [hato.client :as http]
-            [lambdaisland.uri :as uri])
-  (:gen-class))
+            [lambdaisland.uri :as uri]))
 
 (defn- verify-api-url!
   [connection]

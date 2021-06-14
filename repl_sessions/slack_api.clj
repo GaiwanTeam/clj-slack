@@ -1,6 +1,6 @@
 (ns slack-api
   (:require [io.pedestal.log :as log]
-            [co.gaiwan.clj-slack.core :as clj-slack]))
+            [co.gaiwan.slack.api.core :as clj-slack]))
 
 (def conn
   (clj-slack/slack-conn "https://slack.com/api" "xoxb-1111111111111-222222222222-333333333333333333"))

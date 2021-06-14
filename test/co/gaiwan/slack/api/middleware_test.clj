@@ -1,7 +1,7 @@
-(ns co.gaiwan.clj-slack.middleware-test
+(ns co.gaiwan.slack.api.middleware-test
   (:require [clojure.test :refer :all]
             [io.pedestal.log :as log]
-            [co.gaiwan.clj-slack.middleware :as mw]))
+            [co.gaiwan.slack.api.middleware :as mw]))
 
 (def logger #(log/info :slack-api/pagination-error %))
 
