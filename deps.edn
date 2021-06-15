@@ -1,28 +1,34 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure      {:mvn/version "1.10.2"}
+ {org.clojure/clojure {:mvn/version "1.10.2"}
 
   ;; Data formats
-  org.clojure/data.json    {:mvn/version "1.0.0"}
-  hiccup/hiccup            {:mvn/version "2.0.0-alpha2"}
-  lambdaisland/uri         {:mvn/version "1.4.54"}
+  org.clojure/data.json {:mvn/version "1.0.0"}
+  hiccup/hiccup         {:mvn/version "2.0.0-alpha2"}
+  lambdaisland/uri      {:mvn/version "1.4.54"}
 
   ;; Http
-  hato/hato                {:mvn/version "0.8.0"}
+  hato/hato {:mvn/version "0.8.0"}
 
   ;; Logging
   io.pedestal/pedestal.log {:mvn/version "0.5.8"}
-  }
+  co.gaiwan/data-tools     {:local/root "/home/arne/Gaiwan/data-tools"}
+
+  reifyhealth/specmonstah           {:git/url "https://github.com/plexus/specmonstah"
+                                     :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}
+  org.java-websocket/Java-WebSocket {:mvn/version "1.5.1"}
+  com.lambdaisland/glogi            {:mvn/version "1.0.116"}}
+
  :aliases
- {:run-m {:main-opts ["-m" "co.gaiwan.clj-slack"]}
-  :run-x {:ns-default co.gaiwan.clj-slack
-          :exec-fn greet
-          :exec-args {:name "Clojure"}}
-  :test {:extra-paths ["test"]
-         :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.861"}}}
+ {:run-m   {:main-opts ["-m" "co.gaiwan.clj-slack"]}
+  :run-x   {:ns-default co.gaiwan.clj-slack
+            :exec-fn    greet
+            :exec-args  {:name "Clojure"}}
+  :test    {:extra-paths ["test"]
+            :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.861"}}}
   :uberjar {:replace-deps {seancorfield/depstar {:mvn/version "2.0.171"}}
-            :exec-fn hf.depstar/uberjar
-            :exec-args {:aot true
-                        :jar "clj-slack.jar"
-                        :main-class "co.gaiwan.clj-slack"
-                        :sync-pom true}}}}
+            :exec-fn      hf.depstar/uberjar
+            :exec-args    {:aot        true
+                           :jar        "clj-slack.jar"
+                           :main-class "co.gaiwan.clj-slack"
+                           :sync-pom   true}}}}
