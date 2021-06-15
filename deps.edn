@@ -7,17 +7,18 @@
   hiccup/hiccup         {:mvn/version "2.0.0-alpha2"}
   lambdaisland/uri      {:mvn/version "1.4.54"}
 
-  ;; Http
-  hato/hato {:mvn/version "0.8.0"}
+  ;; Http/WS
+  hato/hato                         {:mvn/version "0.8.0"}
+  org.java-websocket/Java-WebSocket {:mvn/version "1.5.1"}
 
   ;; Logging
   io.pedestal/pedestal.log {:mvn/version "0.5.8"}
-  co.gaiwan/data-tools     {:local/root "/home/arne/Gaiwan/data-tools"}
+  com.lambdaisland/glogi   {:mvn/version "1.0.116"}
 
-  reifyhealth/specmonstah           {:git/url "https://github.com/plexus/specmonstah"
-                                     :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}
-  org.java-websocket/Java-WebSocket {:mvn/version "1.5.1"}
-  com.lambdaisland/glogi            {:mvn/version "1.0.116"}}
+  co.gaiwan/data-tools    {:git/url "git@github.com:GaiwanTeam/data-tools"
+                           :sha     "32f078e7d9346fc6a0bc641b204d6026fc713b49"}
+  reifyhealth/specmonstah {:git/url "https://github.com/plexus/specmonstah"
+                           :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}}
 
  :aliases
  {:run-m   {:main-opts ["-m" "co.gaiwan.clj-slack"]}

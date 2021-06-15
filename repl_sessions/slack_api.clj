@@ -17,3 +17,18 @@
     ((log/error :clj-slack/get-users-failed {:resp users})
      (throw (ex-info "Fetching users failed" {:resp users}))))
   users)
+
+(count (clj-slack/get-users conn))
+
+(def users (clj-slack/get-users conn))
+(def channels (clj-slack/get-channels conn))
+
+(spit "resources/co/gaiwan/slack/demo_users.edn"
+      (with-out-str
+        (clojure.pprint/pprint
+         (take 100 (shuffle users)))))
+
+(spit "resources/co/gaiwan/slack/demo_channels.edn"
+      (with-out-str
+        (clojure.pprint/pprint
+         (take 100 (shuffle channels)))))
