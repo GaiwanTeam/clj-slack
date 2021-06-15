@@ -1,0 +1,36 @@
+{"envelope_id" "5b90c32c-8cc7-40b6-883c-810f75af7545",
+ "payload"
+ {"event_id" "Ev025F4G8C57",
+  "api_app_id" "A020MSPVB3R",
+  "token" "ThiuMcsw3EHMrlu97Wv03DqI",
+  "authorizations"
+  [{"enterprise_id" nil,
+    "team_id" "T01G3T4BVGE",
+    "user_id" "U021SEPRAFJ",
+    "is_bot" true,
+    "is_enterprise_install" false}],
+  "team_id" "T01G3T4BVGE",
+  "event_context" "2-message-T01G3T4BVGE-A020MSPVB3R-C01G3T4CDBQ",
+  "event"
+  {"event_ts" "1623749944.000600",
+   "ts" "1623749944.000600",
+   "user" "U01G7GP6L5B",
+   "client_msg_id" "acf33155-49cf-44e3-9566-f85f8670069a",
+   "blocks"
+   [{"type" "rich_text",
+     "block_id" "u/3u",
+     "elements"
+     [{"type" "rich_text_section",
+       "elements" [{"type" "text", "text" "if they work"}]}]}],
+   "text" "if they work",
+   "type" "message",
+   "channel_type" "channel",
+   "channel" "C01G3T4CDBQ",
+   "team" "T01G3T4BVGE"},
+  "event_time" 1623749944,
+  "type" "event_callback",
+  "is_ext_shared_channel" false},
+ "type" "events_api",
+ "accepts_response_payload" false,
+ "retry_attempt" 0,
+ "retry_reason" ""}
