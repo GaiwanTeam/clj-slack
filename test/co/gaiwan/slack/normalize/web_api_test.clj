@@ -5,8 +5,7 @@
             [co.gaiwan.slack.schema :as schema]
             [co.gaiwan.data-tools.schema-derivations :as schema-derivations]
             [malli.core :as malli]
-            [malli.error :as malli-error]
-            ))
+            [malli.error :as malli-error]))
 
 (defn validate! [type value]
   (when-not (malli/validate type value {:registry schema/malli-registry})
@@ -18,5 +17,6 @@
   (read-string (slurp (io/resource "co/gaiwan/slack/demo_users.edn"))))
 
 (deftest users-are-valid
-  (doseq [user (demo-users)]
-    (validate! :slack/user (web-api/user user))))
+  (is (= nil
+         (doseq [user (demo-users)]
+           (validate! :slack/user (web-api/user user))))))
