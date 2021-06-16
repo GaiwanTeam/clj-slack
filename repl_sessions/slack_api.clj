@@ -1,5 +1,5 @@
 (ns slack-api
-  (:require [io.pedestal.log :as log]
+  (:require [lambdaisland.glogc.log :as log]
             [co.gaiwan.slack.api.core :as clj-slack]))
 
 ;; export environment variable SLACK_TOKEN

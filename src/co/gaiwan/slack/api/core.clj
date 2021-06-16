@@ -1,5 +1,5 @@
 (ns co.gaiwan.slack.api.core
-  (:require [io.pedestal.log :as log]
+  (:require [lambdaisland.glogc :as log]
             [co.gaiwan.slack.api.middleware :as mw]
             [co.gaiwan.slack.api.web :as web]))
 
