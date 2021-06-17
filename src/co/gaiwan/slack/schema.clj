@@ -26,6 +26,11 @@
       {"id" {:data-type :string}
        "name" {:data-type :string}
        "avatar-image-url" {:data-type :string}}}
+     "emoji"
+     {:primary-key "alias"
+      :attributes
+      {"alias" {:data-type :string}
+       "url" {:data-type :string}}}
      "team"
      {:attributes
       {}}}}})
