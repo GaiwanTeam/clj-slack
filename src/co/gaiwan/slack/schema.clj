@@ -24,7 +24,7 @@
       :attributes
       {"id" {:data-type :string}
        "name" {:data-type :string}
-       "image-48" {:data-type :string}}}
+       "avatar-image-url" {:data-type :string}}}
      "team"
      {:attributes
       {}}}}})
