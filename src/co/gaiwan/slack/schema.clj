@@ -20,10 +20,11 @@
      {:attributes
       {}}
      "user"
-     {:primary-key "slack-id"
+     {:primary-key "id"
       :attributes
-      {"slack-id" {:data-type :string}
-       "name" {:data-type :string}}}
+      {"id" {:data-type :string}
+       "name" {:data-type :string}
+       "image-48" {:data-type :string}}}
      "team"
      {:attributes
       {}}}}})
@@ -32,3 +33,6 @@
   (malli-reg/registry
    (merge (malli-reg/-schemas malli/default-registry)
           (schema-derivations/malli-registry schema {:closed? true}))))
+
+(comment
+  (schema-derivations/datomic-schema schema))
