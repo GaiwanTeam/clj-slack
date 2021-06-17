@@ -19,4 +19,4 @@
 (deftest users-are-valid
   (is (= nil
          (doseq [user (demo-users)]
-           (validate! :slack/user (web-api/user user))))))
+           (validate! :slack/user (web-api/normal-user user))))))
