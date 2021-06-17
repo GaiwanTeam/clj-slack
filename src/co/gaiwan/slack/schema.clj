@@ -1,6 +1,7 @@
 (ns co.gaiwan.slack.schema
   (:require [co.gaiwan.data-tools.schema-derivations :as schema-derivations]
             [malli.core :as malli]
+            [malli.error :as malli-error]
             [malli.registry :as malli-reg]))
 
 (def schema
@@ -33,6 +34,12 @@
   (malli-reg/registry
    (merge (malli-reg/-schemas malli/default-registry)
           (schema-derivations/malli-registry schema {:closed? true}))))
+
+(defn validate! [type value]
+  (when-not (malli/validate type value {:registry malli-registry})
+    (throw (ex-info (str "Invalid " type)
+                    (-> (malli/explain type value {:registry malli-registry})
+                        (malli-error/humanize))))))
 
 (comment
   (schema-derivations/datomic-schema schema))
