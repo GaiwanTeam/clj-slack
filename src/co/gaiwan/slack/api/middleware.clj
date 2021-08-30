@@ -1,4 +1,6 @@
-(ns co.gaiwan.slack.api.middleware)
+(ns co.gaiwan.slack.api.middleware
+  "Decorators for API request functions that handle cross cutting concerns"
+  (:require [lambdaisland.glogc :as log]))
 
 (defn wrap-rate-limit
   "Decorator for slack request functions which handles rate limiting.
@@ -6,16 +8,13 @@
   necessary."
   [f]
   (fn invoke [& args]
-    (try
-      (apply f args)
-      (catch clojure.lang.ExceptionInfo ex
-        (let [data (ex-data ex)]
-          (if (= 429 (:status data))
-            (let [wait-for (Integer/parseInt (get-in data [:headers "retry-after"]))]
-              (println "rate-limited. Retry in" wait-for "seconds")
-              (Thread/sleep (* (inc wait-for) 1000))
-              (apply invoke args))
-            (throw ex)))))))
+    (let [response (apply f args)]
+      (if (= 429 (:status response))
+        (let [wait-for (Integer/parseInt (get-in response [:headers "retry-after"]))]
+          (log/info :slack-api/rate-limited {:retry-after-seconds wait-for})
+          (Thread/sleep (* (inc wait-for) 1000))
+          (apply invoke args))
+        response))))
 
 (defn wrap-paginate
   "Decorator for slack request functions which handles pagination
@@ -32,7 +31,10 @@
   If the `opts` contains a limit parameter, just use it. If the `opts` does not
   contain a limit parameter, assign the limit parameter as value 1000. The limit
   parameter maximum is 1000 according to the document
-  https://api.slack.com/docs/pagination"
+  https://api.slack.com/docs/pagination
+
+  Needs to come after [[wrap-result]], because this assumes it gets just the
+  parsed JSON body back."
   [error-logger k f]
   (fn paginate
     ([conn]
@@ -54,3 +56,32 @@
          (lazy-f resp)
          resp)))))
 
+(defn wrap-retry-exception
+  "Occasionally we get a low-level SocketException or IOException, sleep and retry at most `retries` times"
+  [retries f]
+  (fn self
+    ([conn]
+     (self conn {}))
+    ([conn opts]
+     (let [count (volatile! 0)]
+       (try
+         (f conn opts)
+         (catch java.io.IOException e
+           (log/error :slack-api/io-exception {:opts opts :retries @count} :exception e)
+           (if (< @count retries)
+             (do
+               (vswap! count inc)
+               (Thread/sleep (* @count @count 1000))
+               (self conn opts))
+             (do
+               (log/error :slack-api/retries-exhausted {:retries @count} :exception e)
+               (throw e)))))))))
+
+(defn wrap-result
+  "Grab the :result key from the response (= parsed json)"
+  [f]
+  (fn self
+    ([conn]
+     (self conn nil))
+    ([conn opts]
+     (:result (f conn opts)))))
