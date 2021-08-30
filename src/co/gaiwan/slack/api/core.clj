@@ -13,14 +13,15 @@
    {:api-url "https://slack.com/api" :token slack-token}))
 
 (defn simple-endpoint [endpoint]
-  (mw/wrap-retry-exception
-   5
-   (mw/wrap-rate-limit
-    (fn self
-      ([connection]
-       (self connection {}))
-      ([connection opt]
-       (web/slack-request connection endpoint opt))))))
+  (mw/wrap-result
+   (mw/wrap-retry-exception
+    5
+    (mw/wrap-rate-limit
+     (fn self
+       ([connection]
+        (self connection {}))
+       ([connection opt]
+        (web/slack-request connection endpoint opt)))))))
 
 (defn collection-endpoint
   [key endpoint]
