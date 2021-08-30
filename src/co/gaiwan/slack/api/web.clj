@@ -1,6 +1,6 @@
 (ns co.gaiwan.slack.api.web
   (:require [clojure.data.json :as json]
-            [lambdaisland.glogc.log :as log]
+            [lambdaisland.glogc :as log]
             [hato.client :as http]
             [lambdaisland.uri :as uri]))
 
@@ -27,21 +27,39 @@
     (verify-token! conn))
   nil)
 
+(defn error?
+  "Is the response an error?
+  This checks for a couple of different cases that might arise. Generally it's
+  advisable to always check if a response is an error before trying to use its
+  results.
+  Slack returns an :ok true/false key in every response. For paginated
+  collection responses we normally unwrap the outer map, unless (= :ok false),
+  so this should also work on collection responses.
+  For rare exceptions where Slack returns a non-200 response with an empty body
+  we simply return `:error`."
+  [response]
+  (or (= :error response)
+      (and (map? response) (false? (:ok response)))))
+
 (defn- send-get-request
   "Sends a GET http request with formatted params.
   Optional request options can be specified which will be passed to `hato`
   without any changes."
   [url {:keys [token path]} & [opts]]
+  (log/debug :slack-api/GET (str url path))
   (let [full-url (str url path)
         response (http/get full-url (merge {:oauth-token token
-                                            :throw-exceptions? false}) opts)]
-    (if-let [body (:body response)]
-      (json/read-str body :key-fn clojure.core/keyword)
-      (do
-        ;; Slack normally returns a JSON body with `:ok false`, so this is for
-        ;; truly exceptional cases
-        (log/error :error-from-slack-api (:error response))
-        :error))))
+                                            :throw-exceptions? false}) opts)
+        result (if-let [body (:body response)]
+                 (json/read-str body :key-fn clojure.core/keyword)
+                 (do
+                   ;; Slack normally returns a JSON body with `:ok false`, so this is for
+                   ;; truly exceptional cases
+                   (log/error :error-from-slack-api (:error response))
+                   :error))]
+    (when (error? result)
+      (log/error :slack-api/error-response response))
+    result))
 
 (defn- request-options
   "Extracts request options from slack connection map.

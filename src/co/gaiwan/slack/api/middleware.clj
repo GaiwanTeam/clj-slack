@@ -1,4 +1,6 @@
-(ns co.gaiwan.slack.api.middleware)
+(ns co.gaiwan.slack.api.middleware
+  "Decorators for API request functions that handle cross cutting concerns"
+  (:require [lambdaisland.glogc :as log]))
 
 (defn wrap-rate-limit
   "Decorator for slack request functions which handles rate limiting.
@@ -12,7 +14,7 @@
         (let [data (ex-data ex)]
           (if (= 429 (:status data))
             (let [wait-for (Integer/parseInt (get-in data [:headers "retry-after"]))]
-              (println "rate-limited. Retry in" wait-for "seconds")
+              (log/info :slack-api/rate-limited {:retry-after-seconds wait-for})
               (Thread/sleep (* (inc wait-for) 1000))
               (apply invoke args))
             (throw ex)))))))
@@ -54,3 +56,23 @@
          (lazy-f resp)
          resp)))))
 
+(defn wrap-retry-exception
+  "Occasionally we get a low-level SocketException or IOException, sleep and retry at most `retries` times"
+  [retries f]
+  (fn do-req
+    ([conn]
+     (do-req conn {}))
+    ([conn opts]
+     (let [count (volatile! 0)]
+       (try
+         (f conn opts)
+         (catch java.io.IOException e
+           (log/error :slack-api/io-exception {:opts opts :retries @count} :exception e)
+           (if (< @count retries)
+             (do
+               (vswap! count inc)
+               (Thread/sleep (* @count @count 1000))
+               (do-req conn opts))
+             (do
+               (log/error :slack-api/retries-exhausted {:retries @count} :exception e)
+               (throw e)))))))))

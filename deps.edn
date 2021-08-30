@@ -1,6 +1,6 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.10.2"}
+ {org.clojure/clojure {:mvn/version "1.10.3"}
 
   ;; Data formats
   org.clojure/data.json {:mvn/version "1.0.0"}
@@ -18,18 +18,19 @@
   co.gaiwan/data-tools    {:git/url "git@github.com:GaiwanTeam/data-tools"
                            :sha     "32f078e7d9346fc6a0bc641b204d6026fc713b49"}
   reifyhealth/specmonstah {:git/url "https://github.com/plexus/specmonstah"
-                           :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}}
+                           :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}
+
+  org.slf4j/jul-to-slf4j         {:mvn/version "1.7.25"}
+  org.slf4j/jcl-over-slf4j       {:mvn/version "1.7.25"}
+  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "1.7.25"}
+  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.2.3"}}
 
  :aliases
- {:run-m   {:main-opts ["-m" "co.gaiwan.clj-slack"]}
-  :run-x   {:ns-default co.gaiwan.clj-slack
-            :exec-fn    greet
-            :exec-args  {:name "Clojure"}}
-  :test    {:extra-paths ["test"]
-            :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.861"}}}
-  :uberjar {:replace-deps {seancorfield/depstar {:mvn/version "2.0.171"}}
-            :exec-fn      hf.depstar/uberjar
-            :exec-args    {:aot        true
-                           :jar        "clj-slack.jar"
-                           :main-class "co.gaiwan.clj-slack"
-                           :sync-pom   true}}}}
+ {:dev {:extra-paths ["dev"]
+        :extra-deps {com.lambdaisland/classpath {:git/url "https://github.com/lambdaisland/classpath"
+                                                 :git/sha "ff96d4f07d5b12b2fe0d8b206eb4a3713ad222d6"}
+                     djblue/portal {:mvn/version "RELEASE"}}}
+  :test {:extra-paths ["test"]
+         :extra-deps  {lambdaisland/kaocha {:mvn/version "RELEASE"}}}
+
+  :run/backfill {:exec-fn co.gaiwan.slack.backfill/backfill}}}
