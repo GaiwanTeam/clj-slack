@@ -3,33 +3,34 @@
  {org.clojure/clojure {:mvn/version "1.10.3"}
 
   ;; Data formats
-  org.clojure/data.json {:mvn/version "1.0.0"}
+  org.clojure/data.json {:mvn/version "2.4.0"}
+  metosin/jsonista      {:mvn/version "0.3.4"}
   hiccup/hiccup         {:mvn/version "2.0.0-alpha2"}
-  lambdaisland/uri      {:mvn/version "1.4.54"}
+  lambdaisland/uri      {:mvn/version "1.10.79"}
+
+  ;; Time
+  clojure.java-time/clojure.java-time {:mvn/version "0.3.3"}
 
   ;; Http/WS
-  hato/hato                         {:mvn/version "0.8.0"}
-  org.java-websocket/Java-WebSocket {:mvn/version "1.5.1"}
+  hato/hato                         {:mvn/version "0.8.2"}
+  org.java-websocket/Java-WebSocket {:mvn/version "1.5.2"}
 
   ;; Logging
-  io.pedestal/pedestal.log {:mvn/version "0.5.8"}
-  com.lambdaisland/glogi   {:mvn/version "1.0.116"}
+  io.pedestal/pedestal.log {:mvn/version "0.5.9"}
+  com.lambdaisland/glogi   {:mvn/version "1.0.136"}
 
   co.gaiwan/data-tools    {:git/url "git@github.com:GaiwanTeam/data-tools"
-                           :sha     "32f078e7d9346fc6a0bc641b204d6026fc713b49"}
-  reifyhealth/specmonstah {:git/url "https://github.com/plexus/specmonstah"
-                           :sha     "382c8c9ced99f206065bff1523b2bf6242e1b187"}
+                           :git/sha "d8c442c85e4f352490463ed1e74d8be13f5a39ea"}
 
-  org.slf4j/jul-to-slf4j         {:mvn/version "1.7.25"}
-  org.slf4j/jcl-over-slf4j       {:mvn/version "1.7.25"}
-  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "1.7.25"}
-  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.2.3"}}
+  org.slf4j/jul-to-slf4j         {:mvn/version "1.7.32"}
+  org.slf4j/jcl-over-slf4j       {:mvn/version "1.7.32"}
+  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "1.7.32"}
+  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.2.6"}}
 
  :aliases
- {:dev {:extra-paths ["dev"]
-        :extra-deps {com.lambdaisland/classpath {:git/url "https://github.com/lambdaisland/classpath"
-                                                 :git/sha "ff96d4f07d5b12b2fe0d8b206eb4a3713ad222d6"}
-                     djblue/portal {:mvn/version "RELEASE"}}}
+ {:dev  {:extra-paths ["dev"]
+         :extra-deps  {com.lambdaisland/classpath {:mvn/version "RELEASE"}
+                       djblue/portal              {:mvn/version "RELEASE"}}}
   :test {:extra-paths ["test"]
          :extra-deps  {lambdaisland/kaocha {:mvn/version "RELEASE"}}}
 
