@@ -13,9 +13,9 @@
       {"timestamp" {:data-type :string}
        "text" {:data-type :string}
        "team" {:data-type :foreign-key
-               :references ["chat" "team"]}
+               :references ["slack" "team"]}
        "channel" {:data-type :foreign-key
-                  :references ["chat" "channel"]}}}
+                  :references ["slack" "channel"]}}}
      "channel"
      {:attributes
       {}}

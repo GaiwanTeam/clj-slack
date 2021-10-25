@@ -1,4 +1,5 @@
-(ns co.gaiwan.slack.api.core
+(ns co.gaiwan.slack.api
+  "Request things from the Slack API"
   (:require [lambdaisland.glogc :as log]
             [co.gaiwan.slack.api.middleware :as mw]
             [co.gaiwan.slack.api.web :as web]))

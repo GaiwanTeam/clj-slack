@@ -157,6 +157,8 @@
 (timecount (ednl/slurp "/tmp/100k.ednl"))
 (timecount (slurp-jsonl "/tmp/100k.jsonl"))
 (timecount (slurp-jsonl2 "/tmp/100k.jsonl"))
+(timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2020-10-13.jsonl"))
+
 (timecount (slurp-transit "/tmp/100k.transit"))
 (timecount (slurp-transit-lines "/tmp/100k.transitl"))
 
@@ -165,6 +167,27 @@
 ;; transit: read 81k events/second
 ;; transit-lines: read 92k events/second
 ;; jsonl2: read 105k events/second
+
+(do
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2020-10-13.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2020-06-23.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2021-10-05.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2020-10-15.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C015DQFEGMT/2020-06-25.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C015DQFEGMT/2020-10-13.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C015DQFEGMT/2020-10-15.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2021-05-18.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C015DQFEGMT/2021-10-06.jsonl"))
+  (timecount (slurp-jsonl2 "/tmp/gene-archive/C015DQFEGMT/2020-06-24.jsonl"))
+  )
+
+;; These are the biggest archive files for does, the first one takes 190ms, the
+;; others 30-40ms. These are outliers though, the median archive file is under
+;; 1kB, the vast majority can be read in under 1ms.
+
+(timecount (slurp-jsonl2 "/tmp/gene-archive/C01CJH7P3M2/2021-10-04.jsonl"))
+(timecount (slurp-jsonl2 "/tmp/gene-archive/C01TK0K6QU9/2021-10-04.jsonl"))
+(timecount (slurp-jsonl2 "/tmp/gene-archive/C01C6EV0ZC6/2021-05-20.jsonl"))
 
 (double (/ 100000 9567.85 ))
 
