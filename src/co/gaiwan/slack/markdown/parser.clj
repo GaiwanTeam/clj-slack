@@ -1,4 +1,7 @@
 (ns co.gaiwan.slack.markdown.parser
+  "Parser for Slack's dialect of Markdown.
+
+  Hand-rolled for performance."
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
@@ -22,7 +25,7 @@
    :blockquote #"^>>>(?s:(.*))$|^>(?!\s>)\s?(.*)(?:$|\R)"
    :reference #"<((?:#C|@U)[A-Z0-9]{7,})(?:\|(.*?))?>"
    :url #"<((?:http|https):[^|]*?)(?:\|(.*?))?>"
-   :emoji #"(?<!\w):([-+\w]*?):"
+   :emoji #"(?<!\w):([-+\w]*?(::skin-tone-\d)?):"
    :italic #"\b_(.*?)_"
    :bold #"(?<![a-zA-Z0-9`])\*(.*?)\*(?![a-zA-Z0-9`])"
    :strike-through #"~(.*?)~"})
@@ -286,7 +289,7 @@
 (defn contains-markup? [s]
   (some markup-symbol? s))
 
-(defn parse2
+(defn parse
   "Parse markdown message into hiccup.
   Return the un-parsed message if any error happens."
   [message]

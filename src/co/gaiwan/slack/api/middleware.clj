@@ -63,18 +63,17 @@
     ([conn]
      (self conn {}))
     ([conn opts]
-     (let [count (volatile! 0)]
-       (try
-         (f conn opts)
-         (catch java.io.IOException e
-           (log/error :slack-api/io-exception {:opts opts :retries @count} :exception e)
-           (if (< @count retries)
+     (try
+       (f conn opts)
+       (catch java.io.IOException e
+         (log/error :slack-api/io-exception {:opts opts} :exception e)
+         (let [retries (:retries opts 0)]
+           (if (< retries 5)
              (do
-               (vswap! count inc)
-               (Thread/sleep (* @count @count 1000))
-               (self conn opts))
+               (Thread/sleep (* retries retries 1000))
+               (self conn (update opts :retries (fnil inc 0))))
              (do
-               (log/error :slack-api/retries-exhausted {:retries @count} :exception e)
+               (log/error :slack-api/retries-exhausted {:retries retries} :exception e)
                (throw e)))))))))
 
 (defn wrap-result

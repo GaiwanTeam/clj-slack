@@ -23,14 +23,19 @@
   nil)
 
 (defn slurp-jsonl
-  "Slurp json-lines (newline delineated json)"
+  "Slurp json-lines (newline delineated json)
+
+  The optional third argument should either be Object, when each line contains a
+  JS object (map), or java.util.List, if each line contains a JS array."
   ([file]
    (slurp-jsonl file jsonista-mapper))
-  ([^File file ^com.fasterxml.jackson.databind.ObjectMapper mapper]
+  ([file mapper]
+   (slurp-jsonl file mapper Object))
+  ([^File file ^com.fasterxml.jackson.databind.ObjectMapper mapper type]
    (with-open [f (io/input-stream file)]
      (-> mapper
          (.readerFor com.fasterxml.jackson.databind.JsonNode)
-         (.withType Object)
+         (.withType type)
          (.readValues f)
          iterator-seq
          doall))))
