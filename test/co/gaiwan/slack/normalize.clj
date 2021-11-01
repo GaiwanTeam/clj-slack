@@ -1,5 +1,5 @@
-(ns co.gaiwan.slack.normalize.events-api-test
-  (:require [co.gaiwan.slack.normalize.events-api :as api]
+(ns co.gaiwan.slack.normalize-test
+  (:require [co.gaiwan.slack.normalize :as api]
             [clojure.test :refer :all]))
 
 (deftest channel-join+reaction

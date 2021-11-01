@@ -1,15 +1,28 @@
-(ns co.gaiwan.slack.normalize.events-api
-  "Code for converting events as we get them from the Slack RTM API into our own
-  data format.")
+(ns co.gaiwan.slack.normalize.messages
+  "Code for converting messages and related events into our own data format.
 
-(defmulti add-event (fn [events event] (get event "type")))
+  For messages we get data both from the RTM API and from the Web
+  API (backfills). While these have some differences they are similar enough
+  that we are generally able to produce code that can transparently handle
+  either.")
+
+(defmulti add-event
+  "Process a single event, adding it to `events`, which is a (sorted) map, keyed
+  by timestamp."
+  (fn [events event] (get event "type")))
 
 (defmethod add-event :default [events _] events)
 
-(defn add-message [events message]
+(defn add-message
+  "Add a message to the events map bassed on its `:message/timestamp`"
+  [events message]
+  (assert (:message/timestamp message))
   (assoc events (:message/timestamp message) message))
 
-(defn add-thread-reply [events thread_ts message]
+(defn add-thread-reply
+  "Add a reply to a message, adding it to a sorted map under `:message/replies`.
+  `thread_ts` is the timestamp of the message that is being replied to."
+  [events thread_ts message]
   (if (contains? events thread_ts)
     (update-in events [thread_ts :message/replies]
                (fnil assoc (sorted-map))

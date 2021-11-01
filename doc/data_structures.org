@@ -1,0 +1,149 @@
+#+TITLE: Clj-slack Data Structures
+
+* Slack Raw Event
+
+Slack is an event-driven platform, with events being represented over the wire
+as JSON objects. When working with these "raw" events we represent them in
+Clojure as maps with String keys.
+
+Events always have a ~type~, like ~message~, ~reaction_added~, or
+~channel_joined~, other common keys include ~ts~, ~event_ts~, ~user~ and
+~channel~. "message" events also have a "subtype" which further determines the
+type of message it is.
+
+We have at the time of writing over 6 years of event data, some of these events
+have changed a bit in that time. This means that the best source for
+understanding the structure of events are the events themselves. Slack's docs
+can be useful to help understand the semantics of certain events, but they only
+show what events look like today, not what they may have looked like in the
+past.
+
+The `raw_events.clj` REPL session should serve as a reference and starting point
+for further exploration.
+
+We generally try to capture everything that Slack can give us, so that we have
+the data should we decide to use it in the future. In practice we only handle a
+small number of event types related to messages, threads, and reactions.
+
+* Slack Raw Archive
+
+** On Disk
+
+To log these events from Slack we capture them in newline-delimited JSON files,
+which are archived and distributed using git. For these for historical reasons
+we use the extension `.txt`, they are typically separated per-day, based on the
+timestamp of the event. Such a pile of JSON files is a "raw" archive. Currently
+these are appended to by a Python application known as [[https://github.com/clojureverse/rtmbot][rtmbot]], which receives
+events from the Slack RTM (real-time messaging) API.
+
+rtmbot is a lightweight process which can run continuously and reliably in the
+background, to make sure we don't miss any events. If we do miss events because
+rtmbot was down for a bit, then we use [[https://github.com/lambdaisland/slack-backfill][slack-backfill]] (now also a part of this
+library).
+
+We try to maintain a weak ordering guarantee that if files are processed in
+alphabetical order, and individual files are processed sequentially
+top-to-bottom, that events that reference previous events/items (e.g. a reaction
+or reply referencing the message it is a reaction/reply to), that the referencee
+is seen at least once before the reference. Events are not guaranteed to be
+unique.
+
+Raw archives, messy and bulky as they may be, are our canonical storage. Any
+derived representation, in a database, in memory, or on disk, can always be
+rebuilt based on the raw archive.
+
+** In Memory
+
+Raw archives are generally not kept in memory, since they quickly become too big
+to conveniently work with. The main thing you can do with them is process them
+as a stream of events, and use that stream to build up some target data
+structure, or populate a target database.
+
+~co.gaiwan.slack.raw-archive/dir-event-seq~ takes a directory, and returns a
+sequence (strictly speaking an eduction) which you can iterate over, reduce,
+transduce, etc.
+
+* Raw Entity Data
+
+From Slack's API we can request various entities, like users, channels, or
+messages. These are different from events, we may have a sequence of events that
+all influence a given entity. It follows that entities are mutable over time.
+E.g.
+
+- message
+- message_change
+- reaction_added
+- message_replied
+- message_deleted
+
+As we process these events we see a given message change over time (and
+eventually be deleted).
+
+If we get entity data from Slack then we need to ensure that we periodically
+refresh it. If we get event data then we can update our own view of the world
+through time.
+
+* Partitioned Archives, or just "Archives"
+
+** On Disk
+
+A partitioned archive, or simply referred to as "archive", is similar to a raw
+archive in that it contains a lot of individual json-lines files, but there are
+a few key differences. Instead of partitioning events solely by date, they are
+split up by channel and date, so you get a nested hierarchy of
+~<channel-id>/<date>.jsonl~ files.
+
+The date in this case is determined to be the date for which the event is
+relevant when rendering a log, which may or may not be the date of the event. If
+an event references another item (message), then it is added to the day of its
+referencee. In practical terms: replies and reactions are always grouped with
+the message they are a reply/reaction to, rather than with the day the
+reply/reaction was posted.
+
+Partitioned archive files are strictly ordered by event timestamp, so that they
+can be processed sequentially in a single pass. They may be pre-filtered, so
+message types that the ultimate consumer doesn't care about are discarded.
+
+Finally they will contain files with entity data: `users.jsonl`,
+`channels.jsonl`, and `emoji.jsonl` file, with the Slack workspace's users,
+channels, and emoji captured from the web API and stored for later reference.
+
+An archive in this sense contains all information necessary to render the slack
+log for a given channel and day, without having to rely on any third party data
+sources.
+
+** In Memory
+
+The main API namespace for working with Archives is ~co.gaiwan.slack.archive~.
+The general pattern is that users, channels, and emoji are read and kept in
+memory, while channel/day specific event data is only read and processed on
+demand, and garbage collected afterwards.
+
+To this end we pass around an ~arch~ map which at a minimum contains a ~:dir~,
+i.e. the root directory of the archive. You can construct this map with
+~co.gaiwan.slack.archive/archive~. While this simply returns a map with a single
+key, it makes the code more explicit, and allows us to add extra defaults to the
+map later on.
+
+~load-api-resources~ will load users, channels, and emoji from disk and add them
+to the map.
+
+~slurp-channel-day~ and ~slurp-channel-day-raw~ read in all messages for a given
+day. The former returns a sequence of normalized message data, with replies and
+reactions added to their referee; the latter returns the sequence of raw slack
+events.
+
+~raw->archive~ creates a partitioned archive from a raw archive.
+~fetch-api-resources~ augments it by fetching users/channels/emoji from the web
+API and storing them.
+
+* Normalized Entities (Messages / Users / Channels)
+
+Normalization is the process through which we take a sequence of raw slack
+events, or raw entity data, and turn it into a sequence of namespaced maps,
+something that looks more like canonical EDN data, and that can easily be dealt
+with in code, or stored for instance in Datalog databases.
+
+
+
+* Enriched Entites

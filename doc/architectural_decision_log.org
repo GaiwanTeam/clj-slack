@@ -1,0 +1,65 @@
+#+TITLE: Clj-slack Architectural Decision Log
+
+* 1. Decoupled Sub-libraries Over Common Data Structures
+** Background / Context
+
+We (Gaiwan) have at this stage built multiple applications and tools that deal
+with Slack history data. While these are separate apps with separate goals, the
+mechanisms they have for dealing with the data often overlap. We need to capture
+and store event streams, read, filter, sort, convert, and summarize them. We
+need to parse their message text, handle emoji, deal with edits, deletions,
+channel renames, and so forth.
+
+** Decision
+
+Clj-slack is a collection of libraries that each implement one of these
+mechanisms in an unopionated manner. They work over a common set of data
+structures, making it easy to compose them into specific applications.
+
+See [[data_structures.org]] for a living document describing the data structures we
+work with.
+
+** Consequences
+
+There are some challenges in doing this right, and so we need to keep this north
+star vision in mind as we work and evolve these libraries, so that we stay close
+to this vision.
+
+We try to avoid incompatibility by having example data, tests, validations, and
+so forth, that all help to verify that the various data interfaces are
+compatible.
+
+Sub-libraries may also be overfitted to the application they were orginally
+developed for, we should strive to dogfood this library in all our slack related
+projects, to ensure that we truly identify the common denominator, and abstract
+away the difference.
+
+* 2. Track Source Information Through Metadata
+
+** Background / Context
+
+Much of what we do here is transforming data in bulk from one representation to
+another. When results don't seem to be what they should be the first step is
+often to trace things back, to find the origin data (e.g. the raw slack events),
+and then manually run through the various transformation steps to see how they
+behave.
+
+Making this "tracing back" easier can significantly help with debugging, and
+allows for smarter dev tooling, like a debug view that augments what is
+displayed.
+
+** Decision
+
+Where practical we use metadata on individual event/message maps to indicate
+where they come from, e.g. ~co.gaiwan.slack.raw-archive/dir-event-seq~ returns
+maps of raw events which have a ~:file~ and ~:line~ key.
+
+When creating a normalized event we can add the raw event to the metadata.
+
+** Consequences
+
+While convenient for debugging, this introduces extra work (wastes cycles), and
+can significantly increase memory usage. We should continue to benchmark to
+decide if the trade-off is worth it, and introduce ways to enable/disable this
+additional information, so that production processes stay lean.
+

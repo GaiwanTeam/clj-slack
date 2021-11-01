@@ -24,7 +24,7 @@
   construct the archive."
   (:require [clojure.java.io :as io]
             [co.gaiwan.json-lines :as jsonl]
-            [co.gaiwan.slack.normalize.events-api :as normalize]
+            [co.gaiwan.slack.normalize :as normalize]
             [co.gaiwan.slack.archive.api-resources :as api-resources]
             [co.gaiwan.slack.archive.partition :as partition]
             [co.gaiwan.slack.normalize.web-api :as norm-web]
@@ -90,7 +90,7 @@
   "Build up a partitioned archive from a raw archive, by providing the source and
   destination directory."
   ([raw-dir archive-dir]
-   (build-archive raw-dir archive-dir nil))
+   (raw->archive raw-dir archive-dir nil))
   ([raw-dir archive-dir {:keys [exts filter-by]
                          :or {exts [".txt" ".jsonl"]
                               filter-by default-event-filter-predicate}}]

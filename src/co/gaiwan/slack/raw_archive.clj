@@ -29,14 +29,10 @@
    (dir-event-seq dir [".txt" ".jsonl"]))
   ([dir exts]
    (eduction
-    (mapcat jsonl/slurp-jsonl)
+    (mapcat (fn [f] (map-indexed #(vary-meta %2 assoc :file f :line (inc %1))
+                                 (jsonl/slurp-jsonl f))))
     (file-seq-by-exts dir exts))))
 
 (comment
-  (into {}
-        (map (juxt key (comp #(into (sorted-map) (map (juxt val key)) %) frequencies #(mapcat last %) val)))
-        (group-by (partial take 2)
-                  (map (juxt #(get % "type")
-                             #(get % "subtype")
-                             keys)
-                       (take 100000 (dir-event-seq "/home/arne/github/clojurians-log"))))))
+  (require '[co.gaiwan.slack.profiling-util :refer :all])
+  (timecount (seq (dir-event-seq "/home/arne/github/clojurians-log"))))

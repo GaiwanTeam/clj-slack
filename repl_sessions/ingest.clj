@@ -1,4 +1,9 @@
 (ns repl-sessions.ingest
+  "Benchmarking to compare various line-based data formats, e.g. edn-lines,
+  json-lines, transit-lines. Line-based so we can easily append events.
+
+  Conclusion: json-lines with Jsonista/jackson is by far the fastest, which is
+  great cause that is also our source format. (what comes out of rtmbot.)"
   (:require [clojure.data.json :as json]
             [clojure.java.io :as io]
             [cognitect.transit :as transit]
