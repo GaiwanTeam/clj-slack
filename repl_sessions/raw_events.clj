@@ -12,6 +12,9 @@
 
 (def raw-slack-log "/home/arne/github/clojurians-log/logs")
 
+(defn event-type [e] (get e "type"))
+(defn subtype [e] (get e "subtype"))
+
 ;; Which keys are present on all events? What is the common denominator?
 (reduce
  #(filter (set %1) (set %2))
@@ -84,7 +87,7 @@
 ;; Which event types are the most common:
 (->> raw-slack-log
      raw/dir-event-seq
-     (eduction (map #(get % "type")))
+     (eduction (map event-type))
      frequencies
      set/map-invert
      (into (sorted-map)))
@@ -241,7 +244,7 @@
   (->> raw-slack-log
        raw/dir-event-seq
        (eduction
-        (filter (comp #{type} #(get % "type")))
+        (filter (comp #{type} event-type))
         (map (fn [e] (remove (get mandatory-keys type) (keys e)))))
        frequencies
        set/map-invert
@@ -269,7 +272,7 @@
         raw/dir-event-seq
         (sequence
          (comp
-          (filter (comp #{type} #(get % "type")))
+          (filter (comp #{type} event-type))
           xform
           (take 10000)))
         shuffle
@@ -301,7 +304,7 @@
 
 (reduce
  (fn [m e]
-   (update m (get e "subtype")
+   (update m (subtype e)
            (fnil set/intersection (->> e
                                        keys
                                        (remove (conj (get mandatory-keys "message") "subtype"))
@@ -309,37 +312,47 @@
            (set (keys e))))
  {}
  (eduction
-  (filter (comp #{"message"} #(get % "type")))
+  (filter (comp #{"message"} event-type))
   (raw/dir-event-seq raw-slack-log)))
 
 (get mandatory-keys "message");; => #{"ts" "type"}
 
 ;; Keys that appear in all messages of a given subtype, besides "ts", "type", "subtype":
 
-{nil #{"user" "text"},
- "app_conversation_leave" #{"user_profile" "event_ts" "inviter" "user" "text" "channel" "team"},
- "message_deleted" #{"event_ts" "hidden" "deleted_ts" "channel"},
- "reply_broadcast" #{"user" "timestamp" "broadcast_thread_ts" "text" "channel" "attachments" "is_multiteam"},
- "bot_message" #{"text"},
- "slackbot_response" #{"event_ts" "user" "text" "channel"},
- "message_changed" #{"message" "event_ts" "hidden" "channel"},
- "channel_archive" #{"user" "text" "channel"},
- "tombstone" #{"latest_reply" "reply_users" "subscribed" "user" "text" "thread_ts" "reply_users_count" "reply_count" "hidden" "parent_user_id" "is_locked"},
- "channel_join" #{"user" "text"},
- "file_share" #{"upload" "user" "text" "channel" "file"},
- "bot_disable" #{"user" "text" "bot_id" "channel"},
- "channel_purpose" #{"user" "text" "purpose"},
- "bot_add" #{"user" "text" "bot_id" "channel"},
- "channel_topic" #{"user" "text" "topic"},
- "message_replied" #{"message" "event_ts" "hidden" "channel"},
- "bot_enable" #{"user" "text" "bot_id" "channel"},
- "file_comment" #{"text" "channel" "file" "comment"},
- "app_conversation_join" #{"user_profile" "event_ts" "inviter" "user" "text" "channel" "team"},
- "thread_broadcast" #{"user" "root" "text" "thread_ts"},
- "file_mention" #{"user" "text" "channel" "file"},
- "reminder_add" #{"user" "text" "channel" "team"},
- "me_message" #{"user" "text"},
- "pinned_item" #{"user" "item_type" "text" "channel"},
- "bot_remove" #{"user" "text" "bot_id" "channel"},
- "channel_leave" #{"user" "text" "channel"},
- "channel_name" #{"user" "old_name" "name" "text"}}
+(def subtype-mandatory-keys
+  {nil #{"user" "text"},
+   "app_conversation_leave" #{"user_profile" "event_ts" "inviter" "user" "text" "channel" "team"},
+   "message_deleted" #{"event_ts" "hidden" "deleted_ts" "channel"},
+   "reply_broadcast" #{"user" "timestamp" "broadcast_thread_ts" "text" "channel" "attachments" "is_multiteam"},
+   "bot_message" #{"text"},
+   "slackbot_response" #{"event_ts" "user" "text" "channel"},
+   "message_changed" #{"message" "event_ts" "hidden" "channel"},
+   "channel_archive" #{"user" "text" "channel"},
+   "tombstone" #{"latest_reply" "reply_users" "subscribed" "user" "text" "thread_ts" "reply_users_count" "reply_count" "hidden" "parent_user_id" "is_locked"},
+   "channel_join" #{"user" "text"},
+   "file_share" #{"upload" "user" "text" "channel" "file"},
+   "bot_disable" #{"user" "text" "bot_id" "channel"},
+   "channel_purpose" #{"user" "text" "purpose"},
+   "bot_add" #{"user" "text" "bot_id" "channel"},
+   "channel_topic" #{"user" "text" "topic"},
+   "message_replied" #{"message" "event_ts" "hidden" "channel"},
+   "bot_enable" #{"user" "text" "bot_id" "channel"},
+   "file_comment" #{"text" "channel" "file" "comment"},
+   "app_conversation_join" #{"user_profile" "event_ts" "inviter" "user" "text" "channel" "team"},
+   "thread_broadcast" #{"user" "root" "text" "thread_ts"},
+   "file_mention" #{"user" "text" "channel" "file"},
+   "reminder_add" #{"user" "text" "channel" "team"},
+   "me_message" #{"user" "text"},
+   "pinned_item" #{"user" "item_type" "text" "channel"},
+   "bot_remove" #{"user" "text" "bot_id" "channel"},
+   "channel_leave" #{"user" "text" "channel"},
+   "channel_name" #{"user" "old_name" "name" "text"}})
+
+(map (juxt meta #(select-keys % (concat
+                                 (get mandatory-keys "message")
+                                 (get subtype-mandatory-keys "message_replied")
+                                 ["subtype" "text"]))))
+(map #(get % "text")
+     (sample-messages "message" (filter (comp #{"reply_broadcast"} subtype))))
+[(sample-messages "message" (filter (comp #{"1614822402.022400"} #(get % "ts"))))
+ (sample-messages "message" (filter (comp #{"1614822402.022400"} #(get % "thread_ts"))))]

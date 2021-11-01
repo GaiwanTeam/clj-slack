@@ -34,22 +34,19 @@
   [events {:strs [ts subtype text channel user thread_ts message] :as event}]
   (cond
     (or (nil? subtype) (= "bot_message" subtype))
-    (add-message events {:message/timestamp ts
-                         :message/text text
-                         :message/channel-id channel
-                         :message/user-id user})
+    (let [message {:message/timestamp ts
+                   :message/text text
+                   :message/channel-id channel
+                   :message/user-id user}]
+      (if thread_ts
+        (add-thread-reply events thread_ts message)
+        (add-message events message)))
 
     (= "message_changed" subtype)
     (assoc-in events [(get message "ts") :message/text] (get message "text"))
 
     (= "message_replied" subtype)
-    (add-thread-reply
-     events
-     thread_ts
-     {:message/timestamp ts
-      :message/text text
-      :message/channel-id channel
-      :message/user-id user})
+    events
 
     (= "thread_broadcast" subtype)
     (let [message {:message/timestamp ts
@@ -103,21 +100,6 @@
 (defmethod add-event "member_left_channel" [events {:strs [ts user]}]
   events)
 
-(defn message-data
-  "Given a seqable of raw events, normalize them to proper EDN event
-  representations. Thread replies and reactions are added to the message they
-  refer to, so the result potentially has a single level of nesting."
-  [raw-events]
-  (map
-   (fn [e]
-     (if (:message/replies e)
-       (update e :message/replies vals)
-       e))
-   (vals
-    (reduce
-     add-event
-     (sorted-map)
-     (sort-by #(get % "ts") raw-events)))))
 
 
 (comment

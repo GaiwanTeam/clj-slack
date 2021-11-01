@@ -15,7 +15,7 @@
 
 (defn demo-users []
   (read-string (slurp (io/resource "co/gaiwan/slack/demo_users.edn"))))
-
+#_
 (deftest users-are-valid
   (is (= nil
          (doseq [user (demo-users)]
