@@ -1,16 +1,20 @@
-// Open Slack, open up their emoji picker, then copy-paste this into the console
+// Open Slack in a browser, then copy-paste this into the console (F12)
+
+// It will scroll through the emoji picker 4 times (once for each skin tone),
+// and finally download the full list of emoji shortcodes.
+
+// You can parse the actual unicode code points out of the image file names.
 
 var emojis={}
-
-var picker_list = document.getElementById('emoji-picker-list');
 
 function selectSkinTone(value) {
     let skin_tone_toggle = document.querySelector('.p-emoji_picker_skintone__toggle_btn');
     skin_tone_toggle.click()
-    simulateMouseClick(document.querySelector('[data-qa="emoji_skintone_option_' + value + '"]'));
+    simulateMouseClick('[data-qa="emoji_skintone_option_' + value + '"]');
 }
 
-function simulateMouseClick(targetNode) {
+function simulateMouseClick(selector) {
+    let targetNode = document.querySelector(selector);
     function triggerMouseEvent(targetNode, eventType) {
         var clickEvent = document.createEvent('MouseEvents');
         clickEvent.initEvent(eventType, true, true);
@@ -28,7 +32,9 @@ function isDone () {
 function collectMore() {
     document.querySelectorAll('#emoji-picker-list *[data-name]').forEach(
         function(button) {
-            emojis[button.getAttribute('data-name')] = button.children[0].getAttribute("src");
+            if (button.children[0]) {
+                emojis[button.getAttribute('data-name')] = button.children[0].getAttribute("src");
+            }
         }
     )
 };
@@ -44,6 +50,10 @@ function download(filename, text) {
 }
 
 var skinTone = 1;
+
+simulateMouseClick('[data-qa="texty_emoji_button"]');
+
+var picker_list = document.getElementById('emoji-picker-list');
 picker_list.scrollTo(0, 0);
 selectSkinTone(skinTone);
 
@@ -51,7 +61,7 @@ selectSkinTone(skinTone);
     collectMore();
     if (isDone()) {
         if (skinTone === 4) {
-            download("emoji.json", JSON.stringify(emojis, null, 2))
+            download("emoji.json", JSON.stringify(emojis, Object.keys(emojis).sort(), 2))
         } else {
             skinTone += 1;
             selectSkinTone(skinTone);

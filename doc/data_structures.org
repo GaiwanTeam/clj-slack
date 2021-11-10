@@ -144,6 +144,4 @@ events, or raw entity data, and turn it into a sequence of namespaced maps,
 something that looks more like canonical EDN data, and that can easily be dealt
 with in code, or stored for instance in Datalog databases.
 
-
-
 * Enriched Entites
