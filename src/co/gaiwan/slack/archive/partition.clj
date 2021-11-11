@@ -5,7 +5,8 @@
             [co.gaiwan.slack.time-util :as time-util]
             [co.gaiwan.json-lines :as jsonl]
             [jsonista.core :as jsonista])
-  (:import (java.io File)))
+  (:import (java.io File)
+           (java.time ZoneId)))
 
 (defn chan-day-file
   "Get the java.io.File containing the events for a given channel+day."
@@ -18,15 +19,14 @@
 
   Keeps open writers under the `:writers` key inside the arch map and reuses
   them, see [[close-writers]] for cleaning up when you're done."
-  [{:keys [dir] :as arch} channel ts]
-  (let [day (time-util/format-inst-day (time-util/ts->inst ts))
-        file (chan-day-file dir channel day)]
-    (if-let [writer (get-in arch [:writers channel day])]
+  [{:keys [dir zone-id] :as arch} channel day-str]
+  (let [file (chan-day-file dir channel day-str)]
+    (if-let [writer (get-in arch [:writers channel day-str])]
       [writer arch]
       (do
         (.mkdirs (.getParentFile ^File file))
         (let [writer (io/writer file :append true)]
-          [writer (assoc-in arch [:writers channel day] writer)])))))
+          [writer (assoc-in arch [:writers channel day-str] writer)])))))
 
 (defn close-writers
   "Close all writers in the arch map.
@@ -43,17 +43,18 @@
   partition it, i.e. you have the channel and the timestamp by which it should
   be partitioned (which may not be the timestamp of the event, in the case of
   replies or reactions which span date boundaries)"
-  [arch channel day-ts event]
+  [arch channel day-str event]
   (let [event-ts (get event "ts")]
     (if (get-in arch [:timestamps channel event-ts])
       arch
-      (let [[writer arch] (ensure-output-writer arch channel day-ts)]
+      (let [[writer arch] (ensure-output-writer arch channel day-str)]
         (jsonl/jsonl-append writer event)
         (update-in arch [:timestamps channel] (fnil conj #{}) event-ts)))))
 
 (defn event-partition-channel
   "Given a raw event, determine how it should be partitioned, i.e. its channel and
-  the timestamp which determines which day to add it to.
+  the timestamp which determines which day to add it to. This function
+  determines the channel-id.
 
   This is meant to be able to handle most types of messages, despite their
   differences in how they encode channel and timestamp information. The main
@@ -73,7 +74,8 @@
 
 (defn event-partition-timestamp
   "Given a raw event, determine how it should be partitioned, i.e. its channel and
-  the timestamp which determines which day to add it to.
+  the timestamp which determines which day to add it to. This function
+  determines the timestamp.
 
   This is meant to be able to handle most types of messages, despite their
   differences in how they encode channel and timestamp information. The main
@@ -94,13 +96,30 @@
       ts
       event_ts))
 
+(defn event-partition-day-str
+  "Given an event, return a day-str like `\"2020-10-15\"`, which is the day it
+  will be appended to. This is the default implementation, this function can be
+  injected to change the logic, e.g. to accomodate for time zones."
+  [event]
+  (time-util/format-inst-day (time-util/ts->inst (event-partition-timestamp event))))
+
+(defn event->day-tz
+  "Return an `event->day` function which allocates events to dates based on a
+  specific timezone."
+  [tz]
+  (let [formatter (.withZone time-util/inst-day-formatter (ZoneId/of tz))]
+    (fn [event]
+      (.format formatter (time-util/ts->inst (event-partition-timestamp event))))))
+
 (defn archive-append-event
   "Append a single slack event to the archive.
   Assuming the event has a channel and timestamp, it will be appended to the
   correct channel/day json-lines file."
-  [arch {:strs [subtype channel ts thread_ts] :as event}]
-  (let [channel (event-partition-channel event)
-        day-ts (event-partition-timestamp event)]
+  [arch {:strs [subtype channel ts thread_ts] :as event} {:keys [event->channel-id event->day]
+                                                          :or {event->channel-id event-partition-channel
+                                                               event->day event-partition-day-str}}]
+  (let [channel (event->channel-id event)
+        day-str (event->day event)]
     (if (= "thread_broadcast" subtype)
       ;; thread broadcast messages get added twice, once at the top level as a
       ;; standalone message, and once as a message reply. We change the
@@ -110,7 +129,7 @@
           (archive-append-event-channel-day channel ts event)
           (archive-append-event-channel-day channel thread_ts (assoc event "subtype" "message_replied")))
       (-> arch
-          (archive-append-event-channel-day channel day-ts event)))))
+          (archive-append-event-channel-day channel day-str event)))))
 
 (defn into-archive
   "Add raw events to the archive, partitioning them in the process. Takes a
@@ -122,16 +141,22 @@
   and [[co.gaiwan.slack.archive/build-archive]].
 
   See [[co.gaiwan.slack.raw-archive/dir-event-seq]] for what to feed into this
-  function."
-  ([dest events]
-   (into-archive dest events nil))
-  ([dest xform events]
-   (let [arch {:dir dest}]
-     (close-writers
-      (transduce
-       xform
-       (completing
-        (fn [arch event]
-          (archive-append-event arch event)))
-       arch
-       events)))))
+  function.
+
+  The options map understands the keys `:event->channel-id`, and `:event->day`,
+  two functions which take a raw event (map with string keys) and return a
+  string, a channel id and day-str (e.g. `\"2020-10-15\"`) respectively. Default
+  implementations are provided which allocate messages based on their UTC date."
+  ([arch events]
+   (into-archive arch identity events))
+  ([arch xform events]
+   (into-archive arch xform events nil))
+  ([arch xform events opts]
+   (close-writers
+    (transduce
+     xform
+     (completing
+      (fn [arch event]
+        (archive-append-event arch event opts)))
+     arch
+     events))))

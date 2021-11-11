@@ -28,14 +28,15 @@
             [co.gaiwan.slack.archive.api-resources :as api-resources]
             [co.gaiwan.slack.archive.partition :as partition]
             [co.gaiwan.slack.normalize.web-api :as norm-web]
-            [co.gaiwan.slack.raw-archive :as raw-archive]))
+            [co.gaiwan.slack.raw-archive :as raw-archive])
+  (:import (java.time ZoneId)))
 
 (defn archive
   "Create a new map identifying the archive.
 
-  This value is passed through operations which may add extra stuff to it."
-  [root-dir]
-  {:dir root-dir})
+  This value is passed through operations which may add extra stuff to it. "
+  ([root-dir]
+   {:dir root-dir}))
 
 (defn slurp-chan-day-raw
   "Get the raw list of events for a given channel and day"

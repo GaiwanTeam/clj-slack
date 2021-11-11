@@ -62,4 +62,3 @@ While convenient for debugging, this introduces extra work (wastes cycles), and
 can significantly increase memory usage. We should continue to benchmark to
 decide if the trade-off is worth it, and introduce ways to enable/disable this
 additional information, so that production processes stay lean.
-

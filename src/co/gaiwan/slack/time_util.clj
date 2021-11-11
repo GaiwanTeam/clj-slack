@@ -14,24 +14,32 @@
   (:require [java-time :as jt]
             [java-time.local :as jt.l]
             [clojure.string :as str])
-  (:import [java.time Instant LocalDate]
-           [java.time.format DateTimeFormatter]))
+  (:import (java.time Instant LocalDate ZonedDateTime ZoneId)
+           (java.time.format DateTimeFormatter)))
+
+(def ^ZoneId UTC (ZoneId/of "UTC"))
+(def ^DateTimeFormatter inst-id-formatter (jt/with-zone (jt/formatter "'inst-'yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'") UTC))
+(def ^DateTimeFormatter inst-iso-formatter (jt/with-zone (jt/formatter "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'") UTC))
+(def ^DateTimeFormatter inst-time-formatter (jt/with-zone (jt/formatter "HH:MM:ss") UTC))
+(def ^DateTimeFormatter inst-day-formatter (jt/with-zone (jt/formatter "yyyy-MM-dd") UTC))
+(def ^DateTimeFormatter inst-day-compact-formatter (jt/with-zone (jt/formatter "yyyyMMdd") UTC))
 
 (defn ts->inst
   "Convert a Slack timestamp like \"1433399521.000490\" into a java.time.Instant like
   #inst \"2015-06-04T06:32:01.000490Z\""
-  [ts]
+  ^Instant [ts]
   (let [[seconds micros] (map #(Double/parseDouble %)
                               (str/split ts #"\."))
         inst (Instant/ofEpochSecond seconds (* 1e3 micros))]
     inst))
 
-(def UTC (jt/zone-id "UTC"))
-(def inst-id-formatter (jt/with-zone (jt/formatter "'inst-'yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'") UTC))
-(def inst-iso-formatter (jt/with-zone (jt/formatter "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'") UTC))
-(def inst-time-formatter (jt/with-zone (jt/formatter "HH:MM:ss") UTC))
-(def inst-day-formatter (jt/with-zone (jt/formatter "yyyy-MM-dd") UTC))
-(def inst-day-compact-formatter (jt/with-zone (jt/formatter "yyyyMMdd") UTC))
+(defn ts->zoned-date-time
+  "Convert a Slack timestamp like \"1433399521.000490\" into a ZonedDateTime in
+  the given time zone, assuming the Slack ts denotes UTC time."
+  ^ZonedDateTime [ts ^ZoneId zone-id]
+  (.withZoneSameInstant
+   (ZonedDateTime/ofInstant (ts->inst ts) UTC)
+   zone-id))
 
 (defn format-inst-id
   "Format an Instant into an id used to link to individual messages. Fun fact: the

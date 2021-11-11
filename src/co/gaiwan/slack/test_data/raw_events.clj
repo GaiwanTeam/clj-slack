@@ -85,3 +85,35 @@
     "channel" "C7YF1SBT3"
     "team" "T03RZGPFR"
     "user_team" "T03RZGPFR"}])
+
+(def pacific-midnight-2020-10-15 ;;=> 1602745200
+  (.toEpochSecond
+   (java.time.ZonedDateTime/parse "2020-10-15T00:00:00-07:00[America/Los_Angeles]")))
+
+(def multiple-days-pacific
+  "Messages that span the boundary of two dates (two before, two after
+  midnight), **in LA time (`America/Los_Angeles`)**"
+  [{"ts" "1602745198.022400"
+    "user" "U010ACDMUHX"
+    "text" "First message"
+    "type" "message"
+    "channel" "C7YF1SBT3"
+    "team" "T03RZGPFR"}
+   {"ts" "1602745199.022400"
+    "user" "U010ACDMUHX"
+    "text" "Second message"
+    "type" "message"
+    "channel" "C7YF1SBT3"
+    "team" "T03RZGPFR"}
+   {"ts" "1602745200.022400"
+    "user" "U010ACDMUHX"
+    "text" "New day"
+    "type" "message"
+    "channel" "C7YF1SBT3"
+    "team" "T03RZGPFR"}
+   {"ts" "1602745201.022400"
+    "user" "U010ACDMUHX"
+    "text" "New day - part 2"
+    "type" "message"
+    "channel" "C7YF1SBT3"
+    "team" "T03RZGPFR"}])
