@@ -33,7 +33,10 @@ function collectMore() {
     document.querySelectorAll('#emoji-picker-list *[data-name]').forEach(
         function(button) {
             if (button.children[0]) {
-                emojis[button.getAttribute('data-name')] = button.children[0].getAttribute("src");
+                let href = button.children[0].getAttribute("src");
+                if (href.includes("production-standard-emoji-assets")) {
+                    emojis[button.getAttribute('data-name')] = href;
+                }
             }
         }
     )
