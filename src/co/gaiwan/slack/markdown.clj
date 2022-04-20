@@ -1,4 +1,9 @@
 (ns co.gaiwan.slack.markdown
+  "Convert slack-flavored Markdown to Hiccup. This namespace contains the main
+  plumbing to recursively transform our parse tree to Hiccup, and base
+  implementations for the different types of elements. If you need specific
+  handling, e.g. for username rendering, then you pass in context-specific
+  handlers."
   (:require [co.gaiwan.slack.markdown.parser :as parser]
             [clojure.string :as str]
             [clojure.walk :as walk]
@@ -31,6 +36,10 @@
             (json/read r)))))
 
 (defn text->emoji
+  "Convert a shortcode like `:woman-running:` into something we can render. Will
+  return an `[:img ...]` for custom emojis, or a unicode character (or character
+  sequence) for standard emojis. Takes an optional emoji-map to be used in
+  addition to the standard built-ins."
   ([text]
    (text->emoji text {}))
   ([text emoji-map]
@@ -75,13 +84,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hiccup
 
-(def segment->hiccup nil)
-
 (defmulti segment->hiccup
-  "Convert a single parsed segment of the form [type content] to hiccup."
+  "Convert a single parsed segment of the form [type content] to hiccup. Handlers
+  are recursively passed down, and can be used to override rendering of certain
+  segment types."
   (fn [[type] handlers] type))
 
-(defn segments->hiccup [segments handlers]
+(defn segments->hiccup
+  "Convert a collection/sequence of segments to Hiccup."
+  [segments handlers]
   (cond
     (string? segments)
     segments
@@ -126,6 +137,10 @@
   [:a {:href content} content])
 
 (defn markdown->hiccup
+  "Take a markdown string and convert it to Hiccup.
+
+  `handlers` is an optional map of keyword -> function, which will override the
+  rendering of a specific type of segment."
   ([md]
    (markdown->hiccup md nil))
   ([md {:keys [handlers]}]
