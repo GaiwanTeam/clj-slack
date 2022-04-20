@@ -1,31 +1,31 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.10.3"}
+ {org.clojure/clojure {:mvn/version "1.11.1"}
 
   ;; Data formats
   org.clojure/data.json {:mvn/version "2.4.0"}
-  metosin/jsonista      {:mvn/version "0.3.4"}
+  metosin/jsonista      {:mvn/version "0.3.5"}
   hiccup/hiccup         {:mvn/version "2.0.0-alpha2"}
-  lambdaisland/uri      {:mvn/version "1.10.79"}
+  lambdaisland/uri      {:mvn/version "1.13.95"}
 
   ;; Time
   clojure.java-time/clojure.java-time {:mvn/version "0.3.3"}
 
   ;; Http/WS
   hato/hato                         {:mvn/version "0.8.2"}
-  org.java-websocket/Java-WebSocket {:mvn/version "1.5.2"}
+  org.java-websocket/Java-WebSocket {:mvn/version "1.5.3"}
 
   ;; Logging
-  io.pedestal/pedestal.log {:mvn/version "0.5.9"}
-  com.lambdaisland/glogi   {:mvn/version "1.0.136"}
+  io.pedestal/pedestal.log {:mvn/version "0.5.10"}
+  com.lambdaisland/glogi   {:mvn/version "1.1.144"}
 
   co.gaiwan/data-tools    {:git/url "git@github.com:GaiwanTeam/data-tools"
                            :git/sha "f00918bd6cd3d6e46276b16dd9c2f061eec76bba"}
 
-  org.slf4j/jul-to-slf4j         {:mvn/version "1.7.32"}
-  org.slf4j/jcl-over-slf4j       {:mvn/version "1.7.32"}
-  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "1.7.32"}
-  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.2.6"}}
+  org.slf4j/jul-to-slf4j         {:mvn/version "1.7.36"}
+  org.slf4j/jcl-over-slf4j       {:mvn/version "1.7.36"}
+  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "1.7.36"}
+  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.2.11"}}
 
  :aliases
  {:dev  {:extra-paths ["dev"]
