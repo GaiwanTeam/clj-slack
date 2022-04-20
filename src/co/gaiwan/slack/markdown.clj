@@ -10,30 +10,59 @@
             [clojure.java.io :as io]
             [clojure.data.json :as json]))
 
-(defn img-url->emoji
-  "Parse the unicode information out of slack's image links and turn it into an
-  emoji or emoji sequence.
 
-  Slack's image links all contain something like 1f482-200d-2642-fe0f which is
-  really just the code points in hex."
-  [url]
-  (try
-    (or
-     (->> (str/split (ffirst (re-seq #"[0-9a-f]{4,5}([-/][0-9a-f]{4,5})*" url)) #"-")
-          (map #(Character/toString (Long/parseLong % 16)))
-          (apply str))
-     url)
-    (catch Exception e
-      url)))
+(defn hex->char
+  "Take a string of unicode characters specified in hexadecimal with dashes, and
+  return the actual unicode character(s)"[hex]
+  (->> (str/split (ffirst (re-seq #"[0-9a-f]{4,5}([-/][0-9a-f]{4,5})*" hex)) #"-")
+       (map #(Character/toString (Long/parseLong % 16)))
+       (apply str)))
+
+(defn skin-tone-mapping
+  "Map from unicode sequence to unicode-sequence-with-X-placeholder, e.g.
+
+  1f469-200d-1f527 -> 1f469-X-200d-1f527
+
+  The emoji on the left can be given a skin tone by replacing the X with a skin tone modifier.
+  "
+  []
+  (with-open [r (io/reader (io/resource "clj-slack/skin_tones.json"))]
+    (into {} (map (fn [s]
+                    [(str/replace s #"-1f3f[b-f]" "")
+                     (str/replace s #"-1f3f[b-f]" "-X")])
+                  (json/read r)))))
 
 (def standard-emoji-map
   "A map from emoji text to emoji.
   `(text->emoji \"smile\") ;; => \"https://..png\"`"
   (delay
-    (with-open [r (io/reader (io/resource "clj-slack/emojis.json"))]
+    (let [skin-tones (skin-tone-mapping)]
       (into {}
-            (map (juxt key (comp img-url->emoji val)))
-            (json/read r)))))
+            (concat
+             ;; Best we've managed to do so far, yank the emoji data right out
+             ;; of slack's JS sources, then combine with the unicode list of
+             ;; characters that take skin tone modifiers.
+             (with-open [r (io/reader (io/resource "clj-slack/emojis_raw.json"))]
+               (mapcat (fn [{:strs [name unicode]}]
+                         (let [skin-tone-pattern (get skin-tones unicode)]
+                           (cond-> [[name (hex->char unicode)]]
+                             skin-tone-pattern
+                             (concat
+                              (map
+                               (fn [[suffix modifier]]
+                                 [(str name "::" suffix) (hex->char (str/replace skin-tone-pattern #"X" modifier))])
+                               {"skin-tone-2" "1f3fb"
+                                "skin-tone-3" "1f3fc"
+                                "skin-tone-4" "1f3fd"
+                                "skin-tone-5" "1f3fe"
+                                "skin-tone-6" "1f3ff"})))))
+                       (vals (json/read r)))))))))
+
+(comment
+  ;; for checking in a browser
+  (spit "/tmp/xxx"
+        (pr-str
+         @standard-emoji-map)))
 
 (defn text->emoji
   "Convert a shortcode like `:woman-running:` into something we can render. Will
