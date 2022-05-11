@@ -8,9 +8,9 @@
 
   clj -X:run/backfill :token '\"xoxb-....\"' :output-dir '\"/tmp/backfill\"'
   "
-  (:require [co.gaiwan.slack.api.core :as api]
+  (:require [co.gaiwan.slack.api :as api]
             [clojure.java.io :as io]
-            [clojure.data.json :as json]))
+            [charred.api :as json]))
 
 (defn fetch-logs [conn target-dir]
   (doseq [{:keys [name id] :as channel} (api/conversations conn)]
@@ -19,11 +19,11 @@
       (when (seq history)
         (with-open [file (io/writer (io/file target-dir (str "000_" id "_" name ".txt")))]
           (doseq [message history]
-            (json/write message file)
+            (json/write-json message file)
             (.write file "\n")
             (when (:thread_ts message)
               (doseq [message (api/replies conn {"channel" id "ts" (:ts message)})]
-                (json/write message file)
+                (json/write-json message file)
                 (.write file "\n")))))))))
 
 (defn backfill [{:keys [token output-dir]}]

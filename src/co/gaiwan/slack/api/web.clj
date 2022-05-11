@@ -1,5 +1,5 @@
 (ns co.gaiwan.slack.api.web
-  (:require [clojure.data.json :as json]
+  (:require [charred.api :as json]
             [lambdaisland.glogc :as log]
             [hato.client :as http]
             [lambdaisland.uri :as uri]))
@@ -51,7 +51,7 @@
         response (http/get full-url (merge {:oauth-token token
                                             :throw-exceptions? false}) opts)
         result (if-let [body (:body response)]
-                 (assoc response :result (json/read-str body :key-fn clojure.core/keyword))
+                 (assoc response :result (json/read-json body :key-fn clojure.core/keyword))
                  ;; Slack normally returns a JSON body with `:ok false`, so this is for
                  ;; truly exceptional cases
                  (assoc response :result :error))]
