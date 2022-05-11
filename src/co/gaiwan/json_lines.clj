@@ -1,5 +1,6 @@
 (ns co.gaiwan.json-lines
   "Handle json-lines files (also known as newline-delimited JSON)"
+  ;; FIXME: can we redo this on top of charred?
   (:require [clojure.java.io :as io]
             [jsonista.core :as jsonista])
   (:import java.io.File))

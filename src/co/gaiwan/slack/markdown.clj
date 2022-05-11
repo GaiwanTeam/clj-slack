@@ -8,7 +8,7 @@
             [clojure.string :as str]
             [clojure.walk :as walk]
             [clojure.java.io :as io]
-            [clojure.data.json :as json]))
+            [charred.api :as json]))
 
 
 (defn hex->char
@@ -30,7 +30,7 @@
     (into {} (map (fn [s]
                     [(str/replace s #"-1f3f[b-f]" "")
                      (str/replace s #"-1f3f[b-f]" "-X")])
-                  (json/read r)))))
+                  (json/read-json r)))))
 
 (def standard-emoji-map
   "A map from emoji text to emoji.
@@ -56,7 +56,7 @@
                                 "skin-tone-4" "1f3fd"
                                 "skin-tone-5" "1f3fe"
                                 "skin-tone-6" "1f3ff"})))))
-                       (vals (json/read r)))))))))
+                       (vals (json/read-json r)))))))))
 
 (comment
   ;; for checking in a browser
