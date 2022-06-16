@@ -46,7 +46,7 @@
   "Connect to a websocket, takes a `:uri` and handlers, mainly `:on-message`.
   Low-level, does not handle reconnects."
   ^WebSocketClient
-  [{:keys [uri on-open on-message on-error on-close]
+  [{:keys [uri on-open on-message on-error on-close keywordize?]
     :or {on-open noop
          on-message noop
          on-error noop
@@ -62,7 +62,7 @@
                (onMessage [message]
                  (log/trace :websocket/message message)
                  (let [{:keys [envelope_id payload] :as parsed}
-                       (json/read-json message :key-fn keyword)]
+                       (json/read-json message :key-fn (if keywordize? keyword identity))]
                    (on-message this parsed)
                    (when envelope_id
                      ;; slack requires acknowledgement like this
@@ -96,7 +96,8 @@
   [[add-listener]]/[[remove-listener]]."
   [{:keys [token
            debug-reconnects?
-           listeners]
+           listeners
+           keywordize?]
     :or {listeners {}}
     :as opts}]
   (let [!conn (atom nil)
@@ -114,6 +115,7 @@
                  (ws-connect* {:uri (cond-> (get-wss-url token)
                                       debug-reconnects?
                                       (str "&debug_reconnects=true"))
+                               :keywordize? keywordize?
                                :on-open (fn [conn handshake]
                                           (run! #(% {:type "websocket"
                                                      :subtype "open"

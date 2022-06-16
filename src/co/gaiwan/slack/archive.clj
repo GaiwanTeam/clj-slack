@@ -58,6 +58,9 @@
       api-resources/load-users
       #_api-resources/load-emoji))
 
+(defn event->channel [{:strs [channel item]}]
+  (or channel (get item "channel")))
+
 (defn default-event-filter-predicate
   "The default predicate used by [[build-archive]] to
   determine whether an event should get added to the archive or not.
@@ -65,38 +68,39 @@
   - Only consider regular channels (id starts with 'C'), not DMs or group messages
   - Only consider message and reaction events, and for message events only a
     specific set of subtypes."
-  [{:strs [type subtype channel]}]
-  (and (string? channel)
-       (= \C (first channel))
-       (or (#{"reaction_added" "reaction_removed"} type)
-           (and (= "message" type)
-                (contains? #{nil
-                             "message_changed"
-                             "message_replied"
-                             "thread_broadcast"
-                             "message_deleted"
-                             "tombstone"
-                             "channel_archive"
-                             "channel_join"
-                             "channel_name"
-                             "channel_purpose"
-                             "channel_topic"
-                             "me_message"
-                             "reminder_add"
-                             "slack_image"
-                             "bot_message"}
-                           subtype)))))
+  [{:strs [type subtype] :as e}]
+  (let [channel (event->channel e)]
+    (and (string? channel)
+         (= \C (first channel))
+         (or (#{"reaction_added" "reaction_removed"} type)
+             (and (= "message" type)
+                  (contains? #{nil
+                               "message_changed"
+                               "message_replied"
+                               "thread_broadcast"
+                               "message_deleted"
+                               "tombstone"
+                               "channel_archive"
+                               "channel_join"
+                               "channel_name"
+                               "channel_purpose"
+                               "channel_topic"
+                               "me_message"
+                               "reminder_add"
+                               "slack_image"
+                               "bot_message"}
+                             subtype))))))
 
 (defn raw->archive
   "Build up a partitioned archive from a raw archive, by providing the source and
   destination directory."
-  ([raw-dir archive-dir]
-   (raw->archive raw-dir archive-dir nil))
-  ([raw-dir archive-dir {:keys [exts filter-by]
-                         :or {exts [".txt" ".jsonl"]
-                              filter-by default-event-filter-predicate}}]
+  ([raw-dir archive]
+   (raw->archive raw-dir archive nil))
+  ([raw-dir archive {:keys [exts filter-by]
+                     :or {exts [".txt" ".jsonl"]
+                          filter-by default-event-filter-predicate}}]
    (partition/into-archive
-    archive-dir
+    archive
     (filter filter-by)
     (raw-archive/dir-event-seq raw-dir exts))))
 

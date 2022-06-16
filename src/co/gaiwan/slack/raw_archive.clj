@@ -29,7 +29,7 @@
    (dir-event-seq dir [".txt" ".jsonl"]))
   ([dir exts]
    (eduction
-    (mapcat (fn [f] (map-indexed #(vary-meta %2 assoc :file f :line (inc %1))
+    (mapcat (fn [f] (map-indexed #(vary-meta %2 assoc :file f :line (inc ^long %1))
                                  (jsonl/slurp-jsonl f))))
     (file-seq-by-exts dir exts))))
 

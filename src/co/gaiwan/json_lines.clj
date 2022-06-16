@@ -36,7 +36,7 @@
    (with-open [f (io/input-stream file)]
      (-> mapper
          (.readerFor com.fasterxml.jackson.databind.JsonNode)
-         (.withType type)
+         (.forType ^Class type)
          (.readValues f)
          iterator-seq
          doall))))

@@ -7,8 +7,9 @@
   (:require [clojure.data.json :as json]
             [clojure.java.io :as io]
             [cognitect.transit :as transit]
-            [lambdaisland.edn-lines :as ednl]
-            [jsonista.core :as jsonista])
+            #_            [lambdaisland.edn-lines :as ednl]
+            [jsonista.core :as jsonista]
+            [charred.api :as charred])
   (:import (java.io File PrintWriter PushbackReader StringWriter
                     Writer StringReader EOFException ByteArrayInputStream ByteArrayOutputStream)
            (java.util LinkedList)))
@@ -81,6 +82,22 @@
                (transit/write tw %)
                (.write out 10))
             contents))))
+
+(defn slurp-jsonl3 [file]
+  #_(map #(charred/read-json %) (line-seq (io/reader file)))
+  (let [r (slurp file)
+        s (charred/read-json-supplier r {:eof-value ::eof
+                                         :eof-error? false
+                                         :bufsize 2024})]
+    (loop [res (transient [])]
+      (let [v (.get s)]
+        (if (= ::eof v)
+          (persistent! res)
+          (recur (conj! res v)))))))
+
+(timecount (slurp-jsonl "/tmp/100k.jsonl"))
+(timecount (slurp-jsonl2 "/tmp/100k.jsonl"))
+(timecount (slurp-jsonl3 "/tmp/100k.jsonl"))
 
 (defmacro timecount [form]
   `(let [start# (System/nanoTime)
@@ -162,6 +179,7 @@
 (timecount (ednl/slurp "/tmp/100k.ednl"))
 (timecount (slurp-jsonl "/tmp/100k.jsonl"))
 (timecount (slurp-jsonl2 "/tmp/100k.jsonl"))
+(timecount (slurp-jsonl3 "/tmp/100k.jsonl"))
 (timecount (slurp-jsonl2 "/tmp/gene-archive/C0155U72JP9/2020-10-13.jsonl"))
 
 (timecount (slurp-transit "/tmp/100k.transit"))
