@@ -3,10 +3,9 @@
  {org.clojure/clojure {:mvn/version "1.11.1"}
 
   ;; Data formats
-  metosin/jsonista      {:mvn/version "0.3.5"}
-  hiccup/hiccup         {:mvn/version "2.0.0-alpha2"}
+  metosin/jsonista      {:mvn/version "0.3.6"}
   lambdaisland/uri      {:mvn/version "1.13.95"}
-  com.cnuernber/charred {:mvn/version "1.004"}
+  com.cnuernber/charred {:mvn/version "1.008"}
 
   ;; Time
   clojure.java-time/clojure.java-time {:mvn/version "0.3.3"}

@@ -1,5 +1,5 @@
 (ns co.gaiwan.slack.normalize-test
-  (:require [co.gaiwan.slack.normalize :as api]
+  (:require [co.gaiwan.slack.normalize :as normalize]
             [co.gaiwan.slack.test-data.raw-events :as data]
             [clojure.test :refer :all]))
 
@@ -15,7 +15,7 @@
            :message/channel-id "C014LA21AS3"
            :message/user-id "U0168MN6HPY"
            :message/system? true}]
-         (api/message-data data/channel-joins+reaction))))
+         (normalize/message-seq data/channel-joins+reaction))))
 
 (deftest single-reply-test
   (is (= [{:message/timestamp "1550831541.063800"
@@ -27,7 +27,7 @@
              :message/text "/hat-tip"
              :message/channel-id "C064BA6G2"
              :message/user-id "U82DUDVMH"}]}]
-         (api/message-data data/single-reply))))
+         (normalize/message-seq data/single-reply))))
 
 (deftest replies+broadcast
   (is (= [{:message/timestamp "1614822402.022400"
@@ -57,7 +57,7 @@
            :message/channel-id "C7YF1SBT3"
            :message/user-id "U061V0GG2"
            :message/thread-broadcast? true}]
-         (api/message-data data/replies+broadcast))))
+         (normalize/message-seq data/replies+broadcast))))
 
 (comment
   (require 'kaocha.repl)

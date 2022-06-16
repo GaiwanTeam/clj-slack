@@ -110,7 +110,7 @@
   (dotimes [i 10]
     (time
      (count
-      (message-data
+      (message-seq
        (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C015DQFEGMT" "2021-10-05")))))
 
   (time
@@ -119,7 +119,7 @@
     ))
 
 
-  (message-data
+  (message-seq
    (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C014LA21AS3" "2020-07-02"))
 
   )

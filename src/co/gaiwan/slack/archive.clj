@@ -24,10 +24,8 @@
   construct the archive."
   (:require [clojure.java.io :as io]
             [co.gaiwan.json-lines :as jsonl]
-            [co.gaiwan.slack.normalize :as normalize]
             [co.gaiwan.slack.archive.api-resources :as api-resources]
             [co.gaiwan.slack.archive.partition :as partition]
-            [co.gaiwan.slack.normalize.web-api :as norm-web]
             [co.gaiwan.slack.raw-archive :as raw-archive])
   (:import (java.time ZoneId)))
 
@@ -44,10 +42,6 @@
   (let [f (partition/chan-day-file (:dir arch) channel-id day-str)]
     (when (.exists f)
       (jsonl/slurp-jsonl f))))
-
-(defn slurp-chan-day
-  [arch channel-id day-str]
-  (normalize/message-data (slurp-chan-day-raw arch channel-id day-str)))
 
 (defn load-api-resources
   "Load the channel, user, and emoji data stored at the top level of the archive

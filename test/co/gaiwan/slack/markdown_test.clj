@@ -116,14 +116,14 @@
             "+1::skin-tone-2"
             "+1::skin-tone-3"
             "+1::skin-tone-4"
+            "+1::skin-tone-5"
+            "+1::skin-tone-6"
             "-1"
             "-1::skin-tone-2"
             "-1::skin-tone-3"
             "-1::skin-tone-4"
+            "-1::skin-tone-5"
+            "-1::skin-tone-6"
             "100"
-            "1234"
-            "8ball"
-            "a"
-            "ab"
-            "abacus"]
+            "1234"]
            (take 14 (sort (keys @markdown/standard-emoji-map)))))))
