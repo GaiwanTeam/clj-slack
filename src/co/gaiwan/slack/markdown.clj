@@ -10,7 +10,6 @@
             [clojure.java.io :as io]
             [charred.api :as json]))
 
-
 (defn hex->char
   "Take a string of unicode characters specified in hexadecimal with dashes, and
   return the actual unicode character(s)"[hex]

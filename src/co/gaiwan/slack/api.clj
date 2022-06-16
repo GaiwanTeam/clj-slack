@@ -35,16 +35,41 @@
 (def users (collection-endpoint :members "users.list"))
 
 (def conversations (collection-endpoint :channels "conversations.list"))
-(def history (collection-endpoint :messages "conversations.history"))
+(def history
+  "(get-history conn {:channel channel-id})"
+  (collection-endpoint :messages "conversations.history"))
 (def replies (collection-endpoint :messages "conversations.replies"))
 
 (def pins (collection-endpoint :items "pins.list"))
 
 (def conversations-join (simple-endpoint "conversations.join"))
 
-(defn join-channel [conn name]
-  (let [channel-id (->> (conversations conn)
-                        (filter (comp #{name} :name_normalized))
-                        first
-                        :id)]
-    (conversations-join conn {:channel channel-id})))
+(def chat-post-message (simple-endpoint "chat.postMessage"))
+
+(defn send-message
+  "Post a message to a specific channel"
+  [conn channel-id msg]
+  (chat-post-message conn {:channel channel-id
+                           :text msg}))
+
+(defn join-channel
+  "Have the bot join a given channel"
+  [conn channel-id]
+  (conversations-join conn {:channel channel-id}))
+
+(defn error?
+  "Is the response an error?
+
+  This checks for a couple of different cases that might arise. Generally it's
+  advisable to always check if a response is an error before trying to use its
+  results.
+
+  Slack returns an :ok true/false key in every response. For paginated
+  collection responses we normally unwrap the outer map, unless (= :ok false),
+  so this should also work on collection responses.
+
+  For rare exceptions where Slack returns a non-200 response with an empty body
+  we simply return `:error`."
+  [response]
+  (or (= :error response)
+      (and (map? response) (false? (:ok response)))))
