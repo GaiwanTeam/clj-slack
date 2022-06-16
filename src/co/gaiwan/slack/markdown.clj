@@ -112,6 +112,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hiccup
 
+;; This could actually be a separate cljc namespace, so we can ship the parsed
+;; markdown in segment form to the frontend, and let the frontend handle the
+;; rendering.
+
 (defmulti segment->hiccup
   "Convert a single parsed segment of the form [type content] to hiccup. Handlers
   are recursively passed down, and can be used to override rendering of certain
@@ -147,7 +151,7 @@
   [:span.username [:em "<" user-id ">"]])
 
 (defmethod segment->hiccup :channel-id [[_ channel-id channel-name] handlers]
-  [:span.channel [:i "#" (or channel-name channel-id) ">"]])
+  [:span.channel [:i "#" (or channel-name channel-id)]])
 
 (defmethod segment->hiccup :emoji [[_ code] handlers]
   [:span.emoji code])

@@ -50,7 +50,7 @@
   (-> arch
       api-resources/load-channels
       api-resources/load-users
-      #_api-resources/load-emoji))
+      api-resources/load-emoji))
 
 (defn event->channel [{:strs [channel item]}]
   (or channel (get item "channel")))

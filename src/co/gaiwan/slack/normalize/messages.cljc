@@ -43,7 +43,9 @@
         (add-message events message)))
 
     (= "message_changed" subtype)
-    (assoc-in events [(get message "ts") :message/text] (get message "text"))
+    (if (contains? events (get message "ts"))
+      (assoc-in events [(get message "ts") :message/text] (get message "text"))
+      events)
 
     (= "message_replied" subtype)
     events
@@ -61,7 +63,9 @@
     events
 
     (#{"message_deleted" "tombstone"} subtype)
-    (assoc-in events [ts :message/deleted?] true)
+    (if (contains? events ts)
+      (assoc-in events [ts :message/deleted?] true)
+      events)
 
     (#{"channel_archive" "channel_join" "channel_name" "channel_purpose" "channel_topic"} subtype)
     (add-message events {:message/timestamp ts
@@ -88,10 +92,14 @@
     events))
 
 (defmethod add-event "reaction_added" [events {:strs [ts reaction item]}]
-  (update-in events [(get item "ts") :message/reactions reaction] (fnil inc 0)))
+  (if (contains? events (get item "ts"))
+    (update-in events [(get item "ts") :message/reactions reaction] (fnil inc 0))
+    events))
 
 (defmethod add-event "reaction_removed" [events {:strs [ts reaction item]}]
-  (update-in events [(get item "ts") :message/reactions reaction] (fnil dec 0)))
+  (if (contains? events (get item "ts"))
+    (update-in events [(get item "ts") :message/reactions reaction] (fnil dec 0))
+    events))
 
 ;; Might still want to handle these later
 (defmethod add-event "member_join_channel" [events {:strs [ts user]}]

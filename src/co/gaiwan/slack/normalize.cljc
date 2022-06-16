@@ -37,4 +37,6 @@
   representations. Thread replies and reactions are added to the message they
   refer to, so the result potentially has a single level of nesting."
   [raw-events]
-  (mmap->mseq (message-map raw-events)))
+  (filter
+   :message/user-id
+   (mmap->mseq (message-map raw-events))))

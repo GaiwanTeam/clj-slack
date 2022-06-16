@@ -1,9 +1,14 @@
 (ns repl-sessions.walkthrough
   (:require [clojure.java.io :as io]
-            [co.gaiwan.slack.raw-archive :as raw]
             [co.gaiwan.slack.archive :as archive]
+            [co.gaiwan.slack.archive.api-resources :as api-resources]
+            [co.gaiwan.slack.enrich :as enrich]
+            [co.gaiwan.slack.markdown :as markdown]
+            [co.gaiwan.slack.normalize :as normalize]
             [co.gaiwan.slack.normalize.messages :as messages]
-            [co.gaiwan.slack.normalize :as normalize]))
+            [co.gaiwan.slack.raw-archive :as raw]
+            [co.gaiwan.slack.test-data.markdown :as md-test-data]
+            [co.gaiwan.slack.ui.components :as components]))
 
 ;; This library bundles functionality for dealing with Slack data in various way
 ;; - Dealing with archive data
@@ -93,3 +98,81 @@
 
 ;; The map format is more convenient for adding more events to as they arrive,
 ;; the seq representation is more suitable for rendering.
+
+;; The archive can be augmented with data from the Slack API: users, channels,
+;; emoji.
+
+(def slack-token (System/getProperty "SLACK_TOKEN")
+  #_"xoxb-...")
+
+;; Use the API to fetch users/channels/emoji. This will save them in files
+;; inside the archive (users.jsonl, channels.jsonl, emoji.json), and add them to
+;; the archive map.
+(def archive (archive/fetch-api-resources archive slack-token))
+
+(:users archive)
+(:channels archive)
+(:emoji archive)
+
+;; You can also load them from disk once they have been saved.
+
+(def archive (archive/load-api-resources archive))
+
+;; Now let's look at the markdown parser
+
+(markdown/markdown->hiccup
+ "This does not belong in this channel. Perhaps <#C8NUSGWG6|news-and-articles> <@UE1747L7J>?")
+;; =>
+("This does not belong in this channel. Perhaps "
+ [:span.channel [:i "#" "news-and-articles"]]
+ " "
+ [:span.username [:em "<" "UE1747L7J" ">"]]
+ "?")
+
+;; As you can see this has converted the markdown to hiccup, but it's taken a
+;; very generic approach to dealing with user and channel data, since it doesn't
+;; have any extra information to be able to render those. However we can
+;; inject "handlers" to render those specific things.
+
+(defn user-id-handler [[_ user-id] _]
+  [:span.username
+   [:a {:href (str "https://someteam.slack.com/team/" user-id)}
+    "@" (get-in archive [:users user-id :user/name] user-id)]])
+
+(defn emoji-handler [[_ code] _]
+  [:span.emoji (get-in archive [:emoji code]
+                       (get @markdown/standard-emoji-map code code))])
+
+(defn channel-handler [[_ channel-id channel-name] handlers]
+  [:span.channel [:a {:href (str "https://example.com/" channel-id)}
+                  "#" (or channel-name channel-id)]])
+
+(def md-handlers
+  {:handlers {:user-id user-id-handler
+              :emoji emoji-handler
+              :channel-id channel-handler}})
+
+(markdown/markdown->hiccup
+ "This does not belong in this channel. Perhaps <#C8NUSGWG6|news-and-articles> <@UE1747L7J>? :kaocha:"
+ md-handlers)
+
+;; The rendering logic for any type of markdown element can be overridden this
+;; way, so it's usable in many different contexts.
+
+;; Now that we have this user, emoji, and channel information, we can "enrich"
+;; the messages in the message-seq, so they are completely ready to be rendered
+;; without further context.
+
+(def messages
+  (-> raw-events
+      (->> (take 1000))
+      normalize/message-seq
+      (enrich/enrich {:users (:users archive)
+                      :handlers md-handlers
+                      :org-name "clojurians"})))
+
+(tap>
+ (with-meta
+   (components/message {:org-name "clojurians"} (rand-nth messages))
+   {:portal.viewer/default
+    :portal.viewer/hiccup}))
