@@ -171,6 +171,8 @@
                       :handlers md-handlers
                       :org-name "clojurians"})))
 
+(user/portal)
+
 (tap>
  (with-meta
    (components/message {:org-name "clojurians"} (rand-nth messages))

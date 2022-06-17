@@ -1,7 +1,6 @@
 (ns co.gaiwan.slack.ui.components
   (:require [clojure.string :as str]))
 
-
 (defn message [{:keys [org-name]}
                {:message/keys [timestamp
                                channel-id
@@ -19,7 +18,7 @@
   [:div.slack-message
    [:div.slack-message-left-box
     [:a.slack-message__profile-pic
-     {:href (slack-user-link org-name user-id)}
+     {:href user-profile-link}
      [:img {:src image-48}]]]
    [:div.slack-message-right-box
     [:a.slack-message__username {:href user-profile-link} display-name]
