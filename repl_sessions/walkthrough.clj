@@ -2,10 +2,12 @@
   (:require [clojure.java.io :as io]
             [co.gaiwan.slack.archive :as archive]
             [co.gaiwan.slack.archive.api-resources :as api-resources]
+            [co.gaiwan.slack.archive.partition :as partition]
             [co.gaiwan.slack.enrich :as enrich]
             [co.gaiwan.slack.markdown :as markdown]
             [co.gaiwan.slack.normalize :as normalize]
             [co.gaiwan.slack.normalize.messages :as messages]
+            [co.gaiwan.slack.raw-archive :as raw-archive]
             [co.gaiwan.slack.raw-archive :as raw]
             [co.gaiwan.slack.test-data.markdown :as md-test-data]
             [co.gaiwan.slack.ui.components :as components]))
@@ -69,7 +71,16 @@
 (def archive (archive/archive "/tmp/cljians-archive"))
 
 ;; This can take a minute or two
-(archive/raw->archive raw-archive-path (archive/archive archive-path))
+(archive/raw->archive raw-archive-path archive)
+
+;; Alternative which is slower and might introduce duplicates, but is less
+;; memory-hungry
+(doseq [events (partition-all 10000 (raw-archive/dir-event-seq raw-archive-path [".txt" ".jsonl"]))]
+  (partition/into-archive
+   archive
+   (filter archive/default-event-filter-predicate)
+   events)
+  (System/gc))
 
 ;; Notice that so far we are leaving these events exactly as we got them from
 ;; Slack, with string keys, underscores, etc.
