@@ -10,10 +10,6 @@ Key features
 ## Requirement
 This library requires Java 11.
 
-## Installation
-
--FIXME: my new application.
-
 ## Usage
 
 ```clojure
