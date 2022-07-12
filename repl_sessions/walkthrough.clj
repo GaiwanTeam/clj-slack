@@ -18,7 +18,9 @@
 ;; - Dealing with the socket API (websocket, live events)
 ;; - Parsing Slack-flavored markdown
 
-;; All pieces are loosely coupled, but share common data types.
+;; All pieces are loosely coupled, but share common data types. You should
+;; probably start by reading [[repl-sessions.abstractions]], to understand these
+;; shared types and interfaces.
 
 ;; ## Dealing with Archive Data
 
@@ -89,11 +91,11 @@
 
 ;; The [[co.gaiwan.slack.normalize]] namespace namespace now allows us to
 ;; process these and turn them into something more clojure-y. It can create two
-;; types of Clojure data structures, a "message-map" and a "message-seq".
+;; types of Clojure data structures, a "message-tree" and a "message-seq".
 
-(normalize/message-map raw-events)
+(normalize/message-tree raw-events)
 
-;; A message map
+;; A message tree
 
 ;; - has keys that are message timestamps
 ;; - It's a sorted map, so `vals` returns messages in timestamp order

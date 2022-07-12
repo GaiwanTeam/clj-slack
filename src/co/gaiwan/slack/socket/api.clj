@@ -7,18 +7,11 @@
   "
   (:require [hato.client :as http]
             [charred.api :as json]
-            [lambdaisland.glogc :as log])
+            [lambdaisland.glogc :as log]
+            [co.gaiwan.slack.protocols :as protocols])
   (:import (java.io ByteArrayInputStream ByteArrayOutputStream)
            (java.net URI)
            (org.java_websocket.client WebSocketClient)))
-
-(defprotocol EventSource
-  (add-listener [this watch-key listener]
-    "Register a listener (single-arity function) which will receive slack events.
-    `watch-key` functions as with [[add-watch]]: passing the same value again
-    will replace the previous listener for that key")
-  (remove-listener [this watch-key]
-    "Remove a previously added listener"))
 
 (defn get-wss-url
   "Given an xapp-... token, request a websocket URL"
@@ -146,7 +139,7 @@
             (when (and conn (not= ::closed conn))
               (.close conn)
               (reset! !conn ::closed))))
-        EventSource
+        protocols/EventSource
         (add-listener [this watch-key listener]
           (swap! listeners assoc watch-key listener))
         (remove-listener [this watch-key]

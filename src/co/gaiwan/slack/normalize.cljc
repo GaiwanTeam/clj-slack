@@ -1,10 +1,10 @@
 (ns co.gaiwan.slack.normalize
   "Convert raw messages into normalized and combined data structures, referred to
-  as [[message-map]] and [[message-seq]]."
+  as [[message-tree]] and [[message-seq]]."
   (:require [co.gaiwan.slack.normalize.messages :as messages]))
 
-(defn message-map
-  "Convert raw slack events into a \"message map\".
+(defn message-tree
+  "Convert raw slack events into a \"message tree\".
 
    - keys are message timestamps
    - It's a sorted map, so `vals` returns messages in order
@@ -19,11 +19,11 @@
    (sorted-map)
    (sort-by #(get % "ts") raw-events)))
 
-(defn mmap->mseq
-  "Convert a 'message-map' to a 'message-seq'. In map representation you can look
-  up events by timestamp, and replies are also keyed by timestamps. In seq
-  representation both the top-level data structure and the `:message/replies`
-  are seqs."
+(defn mtree->mseq
+  "Convert a 'message-tree' or 'mtree' to a 'message-seq' or 'mseq'. In map
+  representation you can look up events by timestamp, and replies are also keyed
+  by timestamps. In seq representation both the top-level data structure and the
+  `:message/replies` are seqs."
   [message-map]
   (map
    (fn [e]
