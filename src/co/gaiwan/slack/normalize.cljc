@@ -39,4 +39,4 @@
   [raw-events]
   (filter
    :message/user-id
-   (mmap->mseq (message-map raw-events))))
+   (mtree->mseq (message-tree raw-events))))
