@@ -12,7 +12,8 @@
             [co.gaiwan.slack.test-data.markdown :as md-test-data]
             [co.gaiwan.slack.ui.components :as components]))
 
-;; This library bundles functionality for dealing with Slack data in various way
+;; This library bundles functionality for dealing with Slack data in various ways.
+
 ;; - Dealing with archive data
 ;; - Dealing with the API (REST)
 ;; - Dealing with the socket API (websocket, live events)
