@@ -1,6 +1,9 @@
 # clj-slack
 
-clj-slack is a Clojure library with several independent Slack libraries. These Slack libraries are designed with an intention to make them work together easily, which means that they both depend on common configuration, message format, and database schema.
+clj-slack is a Clojure library with several independent Slack libraries. These
+Slack libraries are designed with an intention to make them work together
+easily, which means that they both depend on common configuration, message
+format, and database schema.
 
 Key features
 
