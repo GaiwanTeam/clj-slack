@@ -45,21 +45,21 @@
 ;;     (parse-long (str s us))))
 
 (defn left-pad
-  ([n s]
-   (left-pad \space n s))
-  ([c n s]
-   (if (<= n (count s))
+  ([s n]
+   (left-pad s n \space))
+  ([s n c]
+   (if (>= (count s) n)
      s
-     (left-pad c n (str c s)))))
+     (left-pad (str c s) n c))))
 
-(def left-pad-0-10 (partial left-pad \0 10))
-(def left-pad-0-6 (partial left-pad \0 6))
+(defn left-pad-0 [s n]
+  (left-pad s n \0))
 
 (defn us-ts->s [us-ts]
-  (-> us-ts (/ 1e6) math/round str left-pad-0-10))
+  (-> us-ts (/ 1e6) math/round str (left-pad-0 10)))
 
 (defn us-ts->us [us-ts]
-  (-> us-ts (mod 1e6) math/round str left-pad-0-6))
+  (-> us-ts (mod 1e6) math/round str (left-pad-0 6)))
 
 (defn us-ts->ts [us-ts]
   (let [s  (us-ts->s us-ts)
