@@ -29,20 +29,11 @@
 
 (def ts-regex #"(\d{10})\.(\d{6})")
 
-(def ts? (comp boolean (partial re-matches ts-regex)))
-
 (defn ts->us-ts
-  "If ts is a Slack ts string, converts it to Long. Else returns nil."
-  [ts]
-  (when (string? ts)
-    (when-let [[_ s us] (re-matches ts-regex ts)]
-      (parse-long (str s us)))))
-
-;; (defn ts->us-ts
-;;   "Converts a Slack timestamp to a Long."
-;;   [ts]
-;;   (let [[s us] (str/split ts #"\.")]
-;;     (parse-long (str s us))))
+  "If s is a Slack ts string, converts it to Long. Else, returns nil."
+  [s]
+  (when-let [[_ s us] (re-matches ts-regex s)]
+    (parse-long (str s us))))
 
 (defn left-pad
   ([s n]
@@ -74,9 +65,13 @@
   [event offset-us]
   (walk/postwalk
    (fn [form]
-     (if-let [us-ts (ts->us-ts form)]
-       (-> us-ts (offset-us-ts offset-us) us-ts->ts)
-       form))
+     (if-not (string? form)
+       form
+       (if-let [us-ts (ts->us-ts form)]
+         (->> offset-us
+              (offset-us-ts us-ts)
+              us-ts->ts)
+         form)))
    event))
 
 (defn from-events
