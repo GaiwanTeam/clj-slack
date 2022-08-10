@@ -1,12 +1,16 @@
 (ns co.gaiwan.slack.events.replayer
   "EventSource that replays pre-recorded Slack events."
   (:require [clojure.math :as math]
+            [clojure.pprint :as pprint]
+            [clojure.string :as str]
             [clojure.walk :as walk]
-            [co.gaiwan.slack.protocols :as protocols]))
+            [co.gaiwan.json-lines :as jsonl]
+            [co.gaiwan.slack.protocols :as protocols])
+  (:import (java.util.concurrent TimeUnit)))
 
 (defrecord ReplayerEventSource
-    [sorted-events                      ; Atom of sorted sequence events.
-     listeners                          ; Atom of listeners.
+    [sorted-events                      ; Atom. Sorted sequence of events.
+     listeners                          ; Atom. Map of listeners.
      offset-us
      speed]
 
@@ -22,86 +26,152 @@
 ;;; after the decimal point.
 
 ;;; Contextual definitions:
-;;; s :: second
-;;; us :: microsecond
-;;; ts :: Slack timestamp
+;;; s :: seconds
+;;; us :: microseconds
+;;; ts :: Slack’s API timestamp (e.g. "1614822402.022400")
 ;;; us-ts :: timestamp as a Long in microseconds
 
 (def ts-regex #"(\d{10})\.(\d{6})")
 
-(defn ts->us-ts
-  "If s is a Slack ts string, converts it to Long. Else, returns nil."
+(defn ts->micros
+  "If `s` is a ts string, converts it to Long. Else, returns nil."
   [s]
-  (when-let [[_ s us] (re-matches ts-regex s)]
-    (parse-long (str s us))))
+  (when-let [[_ seconds micros] (re-find ts-regex s)]
+    (parse-long (str seconds micros))))
 
-(defn left-pad
-  ([s n]
-   (left-pad s n \space))
-  ([s n c]
-   (if (>= (count s) n)
-     s
-     (left-pad (str c s) n c))))
+(defn micros->ts
+  "Converts `micros` into a timestamp string."
+  [micros]
+  (->> micros
+       (format "%016d")
+       (re-find #"(\d{10})(\d{6})")
+       rest
+       (str/join \.)))
 
-(defn left-pad-0 [s n]
-  (left-pad s n \0))
+(defn micros->millis [micros]
+  (.toMillis (TimeUnit/MICROSECONDS) micros))
 
-(defn us-ts->s [us-ts]
-  (-> us-ts (/ 1e6) math/round str (left-pad-0 10)))
+#_
+(defn current-time-micros
+  "Returns the current time (at evaluation) in microseconds."
+  []
+  (.toMicros (TimeUnit/MILLISECONDS) (System/currentTimeMillis)))
 
-(defn us-ts->us [us-ts]
-  (-> us-ts (mod 1e6) math/round str (left-pad-0 6)))
+(defn get-event-time
+  "Derives `event` time (in microseconds) from its timestamp."
+  [{:strs [ts] :as _event}]
+  (ts->micros ts))
 
-(defn us-ts->ts [us-ts]
-  (let [s  (us-ts->s us-ts)
-        us (us-ts->us us-ts)]
-    (str s \. us)))
-
-(defn offset-us-ts [us-ts offset-us]
-  (+ us-ts offset-us))
+(defn sort-events-chronologically
+  "Returns `events` sorted by reverse chronological order.
+  `events` is a sequence, vector or set of raw events."
+  [events]
+  (sort-by #(get % "ts") events))
 
 (defn offset-event
-  "Takes a raw Slack event and adds offset-us to all its timestamps."
+  "Returns `event` with `offset-us` applied to its timestamps."
   [event offset-us]
   (walk/postwalk
    (fn [form]
      (if-not (string? form)
        form
-       (if-let [us-ts (ts->us-ts form)]
-         (->> offset-us
-              (offset-us-ts us-ts)
-              us-ts->ts)
+       (if-let [micros (ts->micros form)]
+         (micros->ts (+ micros offset-us))
          form)))
    event))
 
+(defn calc-offset
+  "Returns time as if `event` happened now shifted by `offset-us` and `speed`."
+  [base-time event offset-us speed]
+  ;; Take the start time of event,
+  (let [start-time (get-event-time event)]
+    ;; calculate the elapsed time since it started,
+    (-> (- start-time base-time)
+        ;; control the playback speed,
+        (* speed)
+        ;; bring forward in time,
+        (+ base-time)
+        ;; and adjust the offset.
+        (+ offset-us))))
+
+(defn offset-events
+  "Shifts `sorted-events` timestamps by `offset-us` and `speed`"
+  [base-time sorted-events offset-us speed]
+  (let [now (atom base-time)]
+    (map (fn [event]
+           (let [offset (calc-offset @now event offset-us speed)]
+             (offset-event event offset)
+             (reset! now offset))) sorted-events)))
+
 (defn from-events
-  "Take a collection of raw slack events (a sequence/vector/set containing maps)
-  and turn it into a [[protocols/EventSource]]
+  "Turns `raw-events` into an [[protocols/EventSource]].
 
-  Options:
-  - `offset-us`: the number of microseconds that should be added to each event timestamp.
-  If this is omitted, then an offset will be calculated such that the first event (by timestamp) in the collection is emitted immediately (at the current time), and the ones after that relative to the first
-  - `speed`: a factor for how quickly time passes. Defaults to `1` (normal speed). Useful for debugging/dev to speed up the replay.
-  - `listeners`: initial map of listeners (map of keyword to function)."
-  [raw-events {:keys [offset-us speed listeners]
-               :as opts
-               :or {speed 1
-                    listeners {}}}]
-  ;; raw-events is a sequence/vector/set containing maps.
-  (map->ReplayerEventSource {:sorted-events (atom nil)
-                             :listeners (atom listeners)
-                             :offset-us offset-us
-                             :speed speed}))
+  `raw-events` can be a sequence, vector or set containing raw event
+  maps. Events will get sorted chronologically by timestamp.
 
-;; read in the json-lines file and pass it on to `(from-events ...)`, opts as above
-(defn from-json [json-file opts])
+  Supported options in `opts`:
+
+  | Key          | Description                                                         |
+  |:-------------|:--------------------------------------------------------------------|
+  | `:listeners` | Initial map of listeners (map of keyword to function)               |
+  | `:offset-us` | Number of microseconds that should be added to each event timestamp |
+  | `:speed`     | A factor for how quickly time passes. Defaults to 1 (normal speed). |
+
+  Note: If `:offset-us` is omitted, [[replay!]] calculates an offset
+  such that the first event in the sorted collection is emitted
+  immediately (at the current time), and the ones after that relative
+  to the first."
+  [raw-events {:keys [listeners offset-us speed] :as _opts
+               :or   {listeners {}, offset-us 0, speed 1}}]
+  {:pre [(every? map? raw-events)]}
+  (let [sorted-events (sort-events-chronologically raw-events)]
+    (map->ReplayerEventSource {:sorted-events (atom sorted-events)
+                               :listeners     (atom listeners)
+                               :offset-us     offset-us
+                               :speed         speed})))
+
+(defn from-json
+  "Reads raw events from `jsonl-file`. Passes to [[from-events]].
+
+  Check out [[from-events]] for details on supported `opts`.
+
+  Refer to [[co.gaiwan.json-lines]] for more information on the JSON
+  lines format and parsing."
+  [jsonl-file {:keys [_listeners _offset-us _speed] :as opts}]
+  (let [raw-events (jsonl/slurp-jsonl jsonl-file)]
+    (from-events raw-events opts)))
+
+(defn replayer
+  [{:keys [sorted-events listeners offset-us speed]}]
+  (let [now (* (System/currentTimeMillis) 1000)
+        prev (atom (get-event-time (first @sorted-events)))]
+    (doseq [event @sorted-events
+            :let [event-time (get-event-time event)
+                  adjusted-event-time (micros->millis (- event-time @prev))]]
+      (do
+        (Thread/sleep adjusted-event-time)
+        (reset! prev event-time)
+        (println (str "event-time: " event-time "\n" "adjusted: " adjusted-event-time))
+        #_(do
+            (println now)
+            (if (>= event-time now)
+              (println (str "go: " event-time))
+              (println (str "stop: " event-time))))))))
+
+#_(start-replay! replayer)
+
+;; (future
+;;   (start-replay!))
+
+;; (def stop! (start-replay! (from events ,,,)))
 
 (comment
   (require '[co.gaiwan.slack.test-data.raw-events :as test-events])
 
-  (def replayer
-    (from-events test-events/replies+broadcast {:listeners
-                                                {::prn prn}}))
+  (def replayer-test
+    (from-events (rest test-events/replies+broadcast) {:offset-us 50000123
+                                                  :listeners
+                                                  {::prn prn}}))
 
 
   (offset-event {"event_ts" "1614852449.028400"
@@ -119,14 +189,14 @@
                 123456789 ;; 123.456789 seconds
                 )
 
+  (defn make-ts []
+    (->> #(rand-int 10N)
+         repeatedly
+         (take 16)
+         (partition-all 10)
+         (map str/join)
+         (str/join \.)))
 
-  (def make-ts
-    (fn []
-      (->> #(rand-int 9)
-           repeatedly
-           (take 16)
-           (partition-all 10)
-           (map (partial apply str))
-           (clojure.string/join \.))))
+
 
   )
