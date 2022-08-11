@@ -143,20 +143,45 @@
 
 (defn replayer
   [{:keys [sorted-events listeners offset-us speed]}]
-  (let [now (* (System/currentTimeMillis) 1000)
-        prev (atom (get-event-time (first @sorted-events)))]
+  (let [start  (atom (get-event-time (first @sorted-events)))
+        offset (atom offset-us)]
     (doseq [event @sorted-events
-            :let [event-time (get-event-time event)
-                  adjusted-event-time (micros->millis (- event-time @prev))]]
-      (do
-        (Thread/sleep adjusted-event-time)
-        (reset! prev event-time)
-        (println (str "event-time: " event-time "\n" "adjusted: " adjusted-event-time))
-        #_(do
-            (println now)
-            (if (>= event-time now)
-              (println (str "go: " event-time))
-              (println (str "stop: " event-time))))))))
+            :let  [event-time (get-event-time event)
+                  event-interval (- event-time @start)
+                  offset-value @offset]]
+      (cond
+        (neg? offset-value)
+        (do (prn "neg")
+            (swap! offset + event-interval)
+            (run! #(% event) (vals @listeners))
+            (reset! start event-time))
+
+        (pos? offset-value)
+        (do (prn "pos offset")
+            (reset! offset 0)
+            (Thread/sleep (micros->millis offset-value))
+
+            (prn "pos event")
+            (run! #(% event) (vals @listeners))
+            (reset! start event-time))
+
+        :else
+        (do (prn "else")
+            (Thread/sleep (micros->millis event-interval))
+            (run! #(% event) (vals @listeners))
+            (reset! start event-time))))))
+
+(comment
+  (def replayer-test-easy
+    {:sorted-events (atom [{"ts" "0000000001.000000"}
+                           {"ts" "0000000003.000000"}
+                           {"ts" "0000000006.000000"}
+                           {"ts" "0000000009.000000"}
+                           {"ts" "0000000012.000000"}])
+     :listeners (atom {::prn prn})
+     :offset-us -2000000})
+
+  (replayer replayer-test-easy))
 
 #_(start-replay! replayer)
 
