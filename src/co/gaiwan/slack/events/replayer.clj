@@ -141,18 +141,19 @@
   (let [raw-events (jsonl/slurp-jsonl jsonl-file)]
     (from-events raw-events opts)))
 
-(defn replayer
+(defn replay!
   [{:keys [sorted-events listeners offset-us speed]}]
   (let [start  (atom (get-event-time (first @sorted-events)))
         offset (atom offset-us)]
     (doseq [event @sorted-events
             :let  [event-time (get-event-time event)
-                  event-interval (- event-time @start)
-                  offset-value @offset]]
+                   interval (- event-time @start)
+                   sped-up-interval interval ;TODO
+                   offset-value @offset]]
       (cond
         (neg? offset-value)
         (do (prn "neg")
-            (swap! offset + event-interval)
+            (swap! offset + sped-up-interval)
             (run! #(% event) (vals @listeners))
             (reset! start event-time))
 
@@ -167,7 +168,7 @@
 
         :else
         (do (prn "else")
-            (Thread/sleep (micros->millis event-interval))
+            (Thread/sleep (micros->millis sped-up-interval))
             (run! #(% event) (vals @listeners))
             (reset! start event-time))))))
 
@@ -179,9 +180,10 @@
                            {"ts" "0000000009.000000"}
                            {"ts" "0000000012.000000"}])
      :listeners (atom {::prn prn})
-     :offset-us -2000000})
+     :offset-us -3000000
+     :speed 1.5})
 
-  (replayer replayer-test-easy))
+  (replay! replayer-test-easy))
 
 #_(start-replay! replayer)
 
