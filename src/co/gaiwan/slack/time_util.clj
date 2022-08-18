@@ -29,9 +29,12 @@
 (def ^DateTimeFormatter inst-day-compact-formatter
   (jt/with-zone (jt/formatter "yyyyMMdd") UTC))
 
+(def ^DateTimeFormatter debug-formatter
+  (jt/with-zone (jt/formatter "dd-MM HH:mm:ss.SSSSSS") UTC))
+
 (defn ts->inst
   "Converts a Slack timestamp into a java.time.Instant.
-  
+
   Example: from \"1433399521.000490\" to
   #inst \"2015-06-04T06:32:01.000490Z\"."
   ^Instant [ts]
@@ -45,7 +48,7 @@
 
   Returns a ZonedDateTime in the given time zone, assuming the Slack
   timestamp denotes UTC time.
-  
+
   Example of Slack timestamp: \"1433399521.000490\"."
   ^ZonedDateTime [ts ^ZoneId zone-id]
   (.withZoneSameInstant
@@ -53,21 +56,13 @@
    zone-id))
 
 (defn format-inst-id
-  "Formats an Instant into an id used to link to individual messages.
-
-  Fun fact: the old version of the site did this wrong. It seems it
-  offset all times by three hours, so a message posted at 3pm would
-  show up as posted as 6pm. Don't change this as it will break
-  existing links."
+  "Formats an Instant into an id used to link to individual messages."
   [inst]
-  (jt/format inst-id-formatter
-             (jt/plus inst (jt/hours 3))))
+  (jt/format inst-id-formatter inst))
 
 (defn inst-id->inst
   [inst-id-str]
-  (as-> inst-id-str $
-    (jt/instant inst-id-formatter $)
-    (jt/minus $ (jt/hours 3))))
+  (jt/instant inst-id-formatter inst-id-str))
 
 (defn format-inst-time
   "Formats an Instant to a simple hour:minute:second time.
@@ -94,3 +89,9 @@
   [inst]
   (when inst
     (jt/format inst-iso-formatter inst)))
+
+(defn format-debug
+  "non-iso compliant human-readable format"
+  [inst]
+  (when inst
+    (jt/format debug-formatter inst)))

@@ -6,9 +6,10 @@
 (defn duration [events]
   (- (replayer/get-event-time (last events))
      (replayer/get-event-time (first events))))
-
+#_
 (duration @(:sorted-events replayer/replayer))
 
+#_
 (deftest speed-test [events]
   (is (= (duration (replayer/speed 2 events))
          (/ (duration events) 2))))
@@ -30,4 +31,3 @@
         "Medium values should be properly padded.")
     (is (= "1614852449.028400" (replayer/micros->ts 1614852449028400))
         "Values of the exact size should match.")))
-
