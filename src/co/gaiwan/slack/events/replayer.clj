@@ -99,10 +99,44 @@
 
   Refer to [[co.gaiwan.json-lines]] for more information on the JSON
   lines format and parsing."
-  [jsonl-file {:keys [_listeners _offset-us _speed] :as opts}]
+  [jsonl-file {:keys [listeners offset-us speed] :as opts}]
   (let [raw-events (jsonl/slurp-jsonl jsonl-file)]
     (from-events raw-events opts)))
 
+(defn replay!
+  [{:keys [sorted-events listeners offset-us speed stop? done?]
+    :or {stop? (volatile! false)}
+    :as replayer}]
+  (let [start-time (now-micros)
+        adjust (partial adjusted-event-time start-time offset-us speed)]
+    (loop [now start-time]
+      (when-not @stop?
+        (let [expired-events (take-while
+                              (fn [e]
+                                (< (adjust e) now))
+                              @sorted-events)]
+
+          (swap! sorted-events #(drop (count expired-events) %))
+
+          (doseq [e expired-events]
+            (run! (fn [l] (l e)) (vals @listeners)))
+
+          (when-let [remaining (seq @sorted-events)]
+            (Thread/sleep (max (/ (- (adjust (first remaining)) now)
+                                  1000)
+                               50))
+
+            (recur (now-micros))))))))
+
+(defn start!
+  "Kick of the replay in a separate thread (future). Returns a replayer with
+  additional keys `:done?` (deref to wait for completion) and `:stop!` (call as
+  a function to interrupt)."
+  [replayer]
+  (let [stop? (volatile! false)
+        done? (future (replay! (assoc replayer :stop? stop?)))]
+    (assoc replayer :done? done? :stop! #(vreset! stop? true))))
+#_
 (defn replay!
   [{:keys [sorted-events listeners offset-us speed] :as replayer}]
   (let [start-time (now-micros)

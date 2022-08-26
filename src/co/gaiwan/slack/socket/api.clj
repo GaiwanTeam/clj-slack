@@ -93,6 +93,7 @@
            keywordize?]
     :or {listeners {}}
     :as opts}]
+  {:pre [token]}
   (let [!conn (atom nil)
         listeners (atom listeners)
         reconnect!
