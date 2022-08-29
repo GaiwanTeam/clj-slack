@@ -25,12 +25,15 @@
   by timestamps. In seq representation both the top-level data structure and the
   `:message/replies` are seqs."
   [message-map]
-  (map
-   (fn [e]
-     (if (:message/replies e)
-       (update e :message/replies vals)
-       e))
-   (vals message-map)))
+  (->> (vals message-map)
+       (remove :message/thread-ts)
+       (map
+        (fn [m]
+          (if-let [reply-timestamps (:message/reply-timestamps m)]
+            (assoc m
+                   :message/replies
+                   (map #(get message-map %) reply-timestamps))
+            m)))))
 
 (defn message-seq
   "Given a seqable of raw events, normalize them to proper EDN event

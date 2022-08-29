@@ -51,7 +51,7 @@
         response (http/get full-url (merge {:oauth-token token
                                             :throw-exceptions? false}) opts)
         result (if-let [body (:body response)]
-                 (assoc response :result (json/read-json body :key-fn clojure.core/keyword))
+                 (assoc response :result (json/read-json body))
                  ;; Slack normally returns a JSON body with `:ok false`, so this is for
                  ;; truly exceptional cases
                  (assoc response :result :error))]

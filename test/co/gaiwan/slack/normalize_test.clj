@@ -22,6 +22,7 @@
            :message/text "thankyou <@U82DUDVMH> you have made my day"
            :message/channel-id "C064BA6G2"
            :message/user-id "U793EL04V"
+           :message/reply-timestamps #{"1550832057.067300"}
            :message/replies
            [{:message/timestamp "1550832057.067300"
              :message/text "/hat-tip"
@@ -35,6 +36,7 @@
            "Hello all does anyone have any idea where I should be passing the `collection-format : \"csv\"` option in order to parse query parameters values in a comma separated list? Looking through the source code it looks like in `schema-tools.swagger.core` on line 51 the default option is `multi` but I can't seem to find the right spot to overide that default."
            :message/channel-id "C7YF1SBT3"
            :message/user-id "U010ACDMUHX"
+           :message/reply-timestamps #{"1614852449.028400" "1614852801.028600" "1614853014.028900"},
            :message/replies
            [{:message/timestamp "1614852449.028400"
              :message/text
@@ -61,4 +63,5 @@
 
 (comment
   (require 'kaocha.repl)
-  (kaocha.repl/run))
+  (kaocha.repl/run)
+  )

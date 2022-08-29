@@ -4,12 +4,12 @@
 
   Conclusion: json-lines with Jsonista/jackson is by far the fastest, which is
   great cause that is also our source format. (what comes out of rtmbot.)"
-  (:require [clojure.data.json :as json]
+  (:require #_[lambdaisland.edn-lines :as ednl]
+            [charred.api :as charred]
+            [clojure.data.json :as json]
             [clojure.java.io :as io]
             [cognitect.transit :as transit]
-            #_            [lambdaisland.edn-lines :as ednl]
-            [jsonista.core :as jsonista]
-            [charred.api :as charred])
+            [jsonista.core :as jsonista])
   (:import (java.io File PrintWriter PushbackReader StringWriter
                     Writer StringReader EOFException ByteArrayInputStream ByteArrayOutputStream)
            (java.util LinkedList)))

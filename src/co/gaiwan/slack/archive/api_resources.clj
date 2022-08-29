@@ -13,7 +13,8 @@
   key, and a Slack API token."
   [arch token]
   (let [users (slack-api/users (slack-api/conn token))]
-    (jsonl/spit-jsonl (io/file (:dir arch) "users.jsonl") (slack-api/users (slack-api/conn token)))
+    (jsonl/spit-jsonl (io/file (:dir arch) "users.jsonl")
+                      users)
     (assoc arch :users users)))
 
 (defn fetch-channels
