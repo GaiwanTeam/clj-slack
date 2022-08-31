@@ -9,15 +9,14 @@
    "ts" "1621508880.437600"
    "user" "U01UU0ELRM5"
    "client_msg_id" "54bb6fbb-1528-4381-a218-3796139a3144"
-   "blocks"
-   [{"block_id" "v9+e"
-     "type" "rich_text"
-     "elements"
-     [{"type" "rich_text_section"
-       "elements"
-       [{"text" "Thanks so, so much " "type" "text"}
-        {"user_id" "UB5S3V9F0" "type" "user"}
-        {"text" "!! That was awesome" "type" "text"}]}]}]
+   "blocks" [{"block_id" "v9+e"
+              "type" "rich_text"
+              "elements"
+              [{"type" "rich_text_section"
+                "elements"
+                [{"text" "Thanks so, so much " "type" "text"}
+                 {"user_id" "UB5S3V9F0" "type" "user"}
+                 {"text" "!! That was awesome" "type" "text"}]}]}]
    "text" "Thanks so, so much <@UB5S3V9F0>!! That was awesome"
    "suppress_notification" false
    "source_team" "TASMB716H"
@@ -280,3 +279,114 @@
     "reaction" "raised_hands"
     "item" {"ts" "1621543244.008400", "type" "message", "channel" "CATJP0R0X"}
     "type" "reaction_added"}])
+
+(def pin-message
+  [{"event_ts" "1621258056.046800",
+    "ts" "1621258056.046800",
+    "user" "UATE4LJ94",
+    "client_msg_id" "91515293-8165-46db-ab74-251bc4ec4261",
+    "blocks" [{"block_id" "jTr"
+               "type" "rich_text"
+               "elements"
+               [{"type" "rich_text_section"
+                 "elements"
+                 [{"url"
+                   "https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300",
+                   "type" "link"}]}]}],
+    "text" "<https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300>",
+    "suppress_notification" false
+    "source_team" "TASMB716H"
+    "type" "message"
+    "channel" "C015DQFEGMT"
+    "team" "TASMB716H"
+    "user_team" "TASMB716H"}
+   {"event_ts" "1621265782.049600"
+    "item_user" "UATE4LJ94"
+    "ts" "1621265782.049600"
+    "channel_id" "C015DQFEGMT"
+    "user" "UB5S3V9F0"
+    "pin_count" 1
+    "item" {"message"
+            {"permalink"
+             "https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1621258056046800",
+             "ts" "1621258056.046800",
+             "user" "UATE4LJ94",
+             "pinned_to" ["C015DQFEGMT"],
+             "client_msg_id" "91515293-8165-46db-ab74-251bc4ec4261",
+             "blocks"
+             [{"block_id" "jTr",
+               "type" "rich_text",
+               "elements"
+               [{"type" "rich_text_section",
+                 "elements"
+                 [{"url"
+                   "https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300",
+                   "type" "link"}]}]}],
+             "text"
+             "<https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300>",
+             "type" "message",
+             "team" "TASMB716H",
+             "attachments"
+             [{"ts" "1602784310.434300",
+               "channel_id" "C015DQFEGMT",
+               "author_id" "UER7Z68CA",
+               "from_url"
+               "https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300",
+               "id" 1,
+               "footer" "Thread in #ask-the-speaker-plenary",
+               "files"
+               [{"editable" true,
+                 "is_external" false,
+                 "created" 1602775482,
+                 "permalink"
+                 "https://devopsenterprise.slack.com/files/TASMB716H/F01CGBCQYUW",
+                 "last_editor" "UATE4LJ94",
+                 "external_type" "",
+                 "username" "",
+                 "user" "UATE4LJ94",
+                 "id" "F01CGBCQYUW",
+                 "timestamp" 1602776291,
+                 "mode" "docs",
+                 "display_as_bot" false,
+                 "pretty_type" "Arugula",
+                 "non_owner_editable" false,
+                 "name" "Sharing_Videos_with_Others",
+                 "is_public" true,
+                 "mimetype" "application/vnd.slack-docs",
+                 "permalink_public"
+                 "https://slack-files.com/TASMB716H-F01CGBCQYUW-84e01d789c",
+                 "filetype" "docs",
+                 "url_private"
+                 "https://files.slack.com/files-pri/TASMB716H-F01CGBCQYUW/Sharing_Videos_with_Others",
+                 "has_rich_preview" false,
+                 "title" "Sharing Videos with Others",
+                 "url_private_download"
+                 "https://files.slack.com/files-pri/TASMB716H-F01CGBCQYUW/download/Sharing_Videos_with_Others",
+                 "updated" 1602776291,
+                 "size" 2186,
+                 "preview"
+                 "<p>Here’s how you can share the videos from the DevOps Enterprise Summit Las Vegas/Virtual 2020 with others who didn’t attend the conference.<br><br><strong>1. </strong>You send a link to a video you would like to share with someone who didn’t attend the conference.<br><br><strong>2. </strong>When that person clicks the link, they will see an offer page and be prompted to start a two-hour trial by entering their email address.<br></p><div class=\"unfurl-container unfurl-render-pending\"><a class=\"unfurl-placeholder\" href=\"https://devopsenterprise.slack.com/files/UATE4LJ94/F01CPA94HKM/image.png\">https://devopsenterprise.slack.com/files/UATE4LJ94/F01CPA94HKM/image.png</a></div><br><strong>3. </strong>When they submit their email address, they’ll receive a confirmation email -- it should take less than 10 minutes. (We’re working on shortening that delay.)<br><br><strong>4. </strong>Once they get the email, they click the enclosed link, which will take them to the Video Library. They can then start watching videos! (They’ll need to click the link you sent them originally to watch that specific video.)<br><br><strong>5. </strong>They can watch videos for up to two hours during the trial. After the two hours, they’ll see a message on the screen of the video library indicating access has ended and receive an email about the trial ending, along with options for purchasing more access.<br><div class=\"unfurl-container unfurl-render-pending\"><a class=\"unfurl-placeholder\" href=\"https://devopsenterprise.slack.com/files/UATE4LJ94/F01CP4CM9M0/image.png\">https://devopsenterprise.slack.com/files/UATE4LJ94/F01CP4CM9M0/image.png</a></div><h2>Things to keep in mind…</h2><p><strong>1.</strong> Let the person you’re sharing the video with know that they shouldn’t start the trial until they’re ready to watch the video. The two-hour clock starts ticking once they enter their email address and we don’t want the window to close before they see it.<br><br><strong>2.</strong> We’ve had some glitches with watching videos on some phones. It’s probably better for the person to use a laptop or desktop computer for the trial. (We’re working on this, too.) <br></p>",
+                 "public_url_shared" false,
+                 "editor" nil}],
+               "author_link" "https://devopsenterprise.slack.com/team/UER7Z68CA",
+               "author_subname" "Gene Kim - Program Chair - ITREV",
+               "text"
+               "*Have you been wanting to share these amazing talks with your colleagues?*\n\n*A big announcement!*\n\nWe’ve heard how excited you are about sharing the videos you’ve seen here at the DevOps Enterprise Summit — we’ve put together a short-term solution that will enable you to share any video in the Watch library with others who didn’t attend: <http://videolibrary.doesvirtual.com/> \n\nOver the next couple of weeks, we will be enabling individual and organizational passes that some of you have purchased, and eventually a NYTimes-style gate that will allow a certain number of free views. We’ll give you more information when those options are available.\n\nIn the meantime, read this post for instructions on how you can share videos with others right now. Thank you for all the help making this happen!!!\n\n<https://devopsenterprise.slack.com/files/TASMB716H/F01CGBCQYUW>",
+               "original_url"
+               "https://devopsenterprise.slack.com/archives/C015DQFEGMT/p1602784310434300",
+               "fallback"
+               "[October 15th, 2020 10:51 AM] genek101: *Have you been wanting to share these amazing talks with your colleagues?*\n\n*A big announcement!*\n\nWe’ve heard how excited you are about sharing the videos you’ve seen here at the DevOps Enterprise Summit — we’ve put together a short-term solution that will enable you to share any video in the Watch library with others who didn’t attend: <http://videolibrary.doesvirtual.com/> \n\nOver the next couple of weeks, we will be enabling individual and organizational passes that some of you have purchased, and eventually a NYTimes-style gate that will allow a certain number of free views. We’ll give you more information when those options are available.\n\nIn the meantime, read this post for instructions on how you can share videos with others right now. Thank you for all the help making this happen!!!\n\n<https://devopsenterprise.slack.com/files/TASMB716H/F01CGBCQYUW>",
+               "is_thread_root_unfurl" true,
+               "mrkdwn_in" ["text"],
+               "author_icon"
+               "https://avatars.slack-edge.com/2019-06-23/673715421909_0f09c8af78c886174ff3_48.jpg",
+               "channel_name" "ask-the-speaker-plenary",
+               "author_name" "Gene Kim - Program Chair - ITREV",
+               "is_msg_unfurl" true}]},
+            "created" 1621265782,
+            "created_by" "UB5S3V9F0",
+            "type" "message",
+            "channel" "C015DQFEGMT"},
+    "type" "pin_added",
+    "pinned_info"
+    {"pinned_by" "UB5S3V9F0", "channel" "C015DQFEGMT", "pinned_ts" 1621265782}}])

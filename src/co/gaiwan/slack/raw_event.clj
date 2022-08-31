@@ -25,6 +25,7 @@
   - reaction_added/reaction_removed : the message the user is reacting to
   - message_deleted/tombstone: the message that was deleted
   - message_changed : the message that was edited
+  - pin_added / removed: the message that was pinned
   "
   [{:strs [type subtype ts item message deleted_ts]}]
   (case type
@@ -32,6 +33,10 @@
     (get item "ts")
     "reaction_removed"
     (get item "ts")
+    "pin_added"
+    (get-in item ["message" "ts"])
+    "pin_removed"
+    (get-in item ["message" "ts"])
     "message"
     (case subtype
       "message_changed"

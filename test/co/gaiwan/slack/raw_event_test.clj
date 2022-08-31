@@ -8,7 +8,11 @@
           "1593700697.043500"
           "1593697538.043200"]
          (map raw-event/message-ts raw-events/channel-joins+reaction)))
-  (is (apply = (map raw-event/message-ts raw-events/deletion))))
+  (is (apply = (map raw-event/message-ts raw-events/deletion)))
+
+  (is ["1621258056.046800"
+       "1621258056.046800"]
+      (map raw-event/message-ts raw-events/pin-message)))
 
 (deftest regular-message?-test
   (is (= [false false false]

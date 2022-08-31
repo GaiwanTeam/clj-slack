@@ -4,7 +4,6 @@
             [clojure.test :refer [deftest is are testing run-tests use-fixtures]]))
 
 (deftest add-message-test
-
   (testing "type:message / subtype:<blank>"
     (is (= {"1621508880.437600" {:message/timestamp "1621508880.437600",
                                  :message/text "Thanks so, so much <@UB5S3V9F0>!! That was awesome",
@@ -45,8 +44,7 @@
     (= [{}
         {"1652269908.038599"
          {:message/timestamp "1652269908.038599"
-          :message/text
-          " set up a reminder on “Get your copy of A Radical Enterprise by @Matt K. Parker he/him (Speaker/Author) at happy hour today, thanks to IT Revolution (xpo-itrevolution)!\nhttps://devopsenterprise.slack.com/files/UATE4LJ94/F02GCSAMUDT/image.png” in this channel at 1:17PM today, Eastern Daylight Time."
+          :message/text " set up a reminder on “Get your copy of A Radical Enterprise by @Matt K. Parker he/him (Speaker/Author) at happy hour today, thanks to IT Revolution (xpo-itrevolution)!\nhttps://devopsenterprise.slack.com/files/UATE4LJ94/F02GCSAMUDT/image.png” in this channel at 1:17PM today, Eastern Daylight Time."
           :message/channel-id "C015FGB49UK"
           :message/user-id "UATE4LJ94"
           :message/emphasis? true}}
@@ -73,4 +71,8 @@
             ["1614852449.028400" "1614822402.022400"]
             ["1614852801.028600" "1614822402.022400"]
             ["1614853014.028900" "1614822402.022400"]]
-           (map messages/affected-keys raw-events/replies+broadcast)))))
+           (map messages/affected-keys raw-events/replies+broadcast))))
+
+  (testing "pin event"
+    (is (= [["1621258056.046800"] ["1621258056.046800"]]
+           (map messages/affected-keys raw-events/pin-message)))))
