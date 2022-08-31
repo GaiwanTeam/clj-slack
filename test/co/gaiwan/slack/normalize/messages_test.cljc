@@ -57,4 +57,20 @@
           :message/text "This message was deleted."
           :message/user-id "USLACKBOT"
           :message/system? true}}]
-       (reductions co.gaiwan.slack.normalize.messages/add-event {} raw-events/deletion))))
+       (reductions messages/add-event {} raw-events/deletion))))
+
+(deftest affected-keys-test
+  (is (= ["1593099709.291400"]
+         (messages/affected-keys raw-events/bot-message)))
+
+  (testing "Reactions affect the message they are a reaction to"
+    (is (= [["1621543244.008400"]
+            ["1621543244.008400"]]
+           (map messages/affected-keys raw-events/message+reaction))))
+
+  (testing "replies affect themselves and the parent"
+    (is (= [["1614822402.022400"]
+            ["1614852449.028400" "1614822402.022400"]
+            ["1614852801.028600" "1614822402.022400"]
+            ["1614853014.028900" "1614822402.022400"]]
+           (map messages/affected-keys raw-events/replies+broadcast)))))

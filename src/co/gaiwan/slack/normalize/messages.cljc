@@ -7,18 +7,33 @@
   either."
   (:require [co.gaiwan.slack.raw-event :as raw-event]))
 
-(defmulti add-event
+(def ignored-type-subtype
+  "Type/subtype combinations which we currently simply ignore"
+  #{["message" "group_join"]
+    ["message" "group_leave"]})
+
+(defn affected-keys
+  "Which keys in the message tree are affected by the event? returns a sequence of
+  0 (event is ignored), 1 (regular message, reaction), or 2 (reply) timestamps."
+  [event]
+  (when-not (contains? ignored-type-subtype
+                       [(raw-event/type event) (raw-event/subtype event)])
+    (cond-> [(raw-event/message-ts event)]
+      (raw-event/parent-ts event)
+      (conj (raw-event/parent-ts event)))))
+
+(defmulti -add-event
   "Process a single event, adding it to `message-tree`, which is a (sorted) map, keyed
   by timestamp."
   (fn [message-tree event] (get event "type")))
 
-(defmulti affected-keys
-  "Which keys in the message tree are affected by the event? returns a sequence of
-  0 (event is ignored), 1 (regular message, reaction), or 2 (reply) timestamps."
-  (fn [event] (get event "type")))
+(defn add-event [message-tree event]
+  (if (contains? ignored-type-subtype
+                 [(raw-event/type event) (raw-event/subtype event)])
+    message-tree
+    (-add-event message-tree event)))
 
-(defmethod add-event :default [message-tree _] message-tree)
-(defmethod affected-keys :default [event] nil)
+(defmethod -add-event :default [message-tree _] message-tree)
 
 (defn add-message
   "Add a message to the message-tree map bassed on its `:message/timestamp`"
@@ -38,7 +53,7 @@
         (assoc (:message/timestamp message) (assoc message :message/thread-ts thread_ts)))
     message-tree))
 
-(defmethod add-event "message"
+(defmethod -add-event "message"
   [message-tree {:strs [subtype text channel message] :as event}]
   (let [message-ts (raw-event/message-ts event)
         user (raw-event/user-id event)]
@@ -60,9 +75,6 @@
       (if (contains? message-tree message-ts)
         (assoc-in message-tree [message-ts :message/text] (get message "text"))
         message-tree)
-
-      (#{"group_join" "group_leave" "bot_message"} subtype)
-      message-tree
 
       (#{"message_deleted" "tombstone"} subtype)
       (if (contains? message-tree message-ts)
@@ -106,31 +118,19 @@
       :else
       message-tree)))
 
-(defmethod affected-keys "message" [{:strs [ts subtype] :as event}]
-  (cond
-    (= "message_changed" subtype)
-    [ts]
-    (#{"channel_archive" "channel_join" "channel_name" "channel_purpose" "channel_topic"} subtype)
-    nil
-    ;;TODO
-    ))
-
-(defmethod add-event "reaction_added" [message-tree {:strs [ts reaction item]}]
+(defmethod -add-event "reaction_added" [message-tree {:strs [ts reaction item]}]
   (if (contains? message-tree (get item "ts"))
     (update-in message-tree [(get item "ts") :message/reactions reaction] (fnil inc 0))
     message-tree))
 
-(defmethod affected-keys "reaction_added" [{:strs [ts subtype] :as event}]
-  [ts])
-
-(defmethod add-event "reaction_removed" [message-tree {:strs [ts reaction item]}]
+(defmethod -add-event "reaction_removed" [message-tree {:strs [ts reaction item]}]
   (if (contains? message-tree (get item "ts"))
     (update-in message-tree [(get item "ts") :message/reactions reaction] (fnil dec 0))
     message-tree))
 
 ;; Might still want to handle these later
-(defmethod add-event "member_join_channel" [message-tree {:strs [ts user]}]
-  message-tree)
+;; (defmethod -add-event "member_join_channel" [message-tree {:strs [ts user]}]
+;;   message-tree)
 
-(defmethod add-event "member_left_channel" [message-tree {:strs [ts user]}]
-  message-tree)
+;; (defmethod -add-event "member_left_channel" [message-tree {:strs [ts user]}]
+;;   message-tree)

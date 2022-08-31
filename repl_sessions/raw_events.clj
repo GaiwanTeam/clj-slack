@@ -297,7 +297,7 @@
                                                    #(get % "thread_ts" (get % "ts")))))))
 
 (sample-messages "message" (comp
-                            (filter (comp #{"1652269908.038599"}
+                            (filter (comp #{"1621543244.008400",}
                                           #(get % "ts")))))
 
 (sample-messages "reaction_added")

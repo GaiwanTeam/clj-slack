@@ -259,3 +259,24 @@
     "hidden" true,
     "deleted_ts" "1652269908.038599",
     "channel" "C015FGB49UK"}])
+
+(def message+reaction
+  [{"latest_reply" "1621581987.015200"
+    "reply_users" ["UPN12PF25" "U015ULPEEP4"]
+    "ts" "1621543244.008400"
+    "subscribed" false
+    "user" "U015ULPEEP4"
+    "client_msg_id" "4a04b4f7-42e2-40f1-96ea-190f09e8006b",
+    "text" "Here is the _collection of all the *reference links*_ that were *shared / discussed* during the #DOES21 event.\n\n<https://www.linkedin.com/pulse/devops-enterprise-summit-2021-reference-links-minus-books-pareek>\n\nEnjoy Reading :slightly_smiling_face:",
+    "thread_ts" "1621543244.008400"
+    "type" "message"
+    "channel" "CATJP0R0X"
+    "team" "TASMB716H"
+    "is_locked" false}
+   {"event_ts" "1621620799.017200"
+    "item_user" "U015ULPEEP4"
+    "ts" "1621620799.017200"
+    "user" "U01S4F9HW01"
+    "reaction" "raised_hands"
+    "item" {"ts" "1621543244.008400", "type" "message", "channel" "CATJP0R0X"}
+    "type" "reaction_added"}])
