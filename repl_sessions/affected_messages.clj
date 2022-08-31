@@ -8,19 +8,21 @@
             [co.gaiwan.slack.enrich :as enrich]
             [co.gaiwan.slack.api :as api]
             [co.gaiwan.slack.normalize.web-api :as norm-web]
+            [co.gaiwan.json-lines :as jsonl]
             ))
 
 ;; https://linear.app/gaiwan/issue/ITR-41
 
-(messages/add-event
- {}
- {"ts" "1602745198.022400",
-  "user" "U010ACDMUHX",
-  "text" "First message",
-  "type" "message",
-  "channel" "C7YF1SBT3",
-  "team" "T03RZGPFR"}
- )
+(messages/add-event (sorted-map) {"ts" "1602745198.022400", "user" "U010ACDMUHX", "text" "First message", "type" "message", "channel" "C7YF1SBT3", "team" "T03RZGPFR"})
+
+(reduce messages/add-event
+        (sorted-map)
+        raw-events/single-reply)
+
+(reduce messages/add-event
+        (sorted-map)
+        (jsonl/slurp-jsonl "/home/arne/github/clojurians-log-demo-data/logs/2018-02-01.txt"))
+
 ;; => {"1602745198.022400"
 ;;     #:message{:timestamp "1602745198.022400",
 ;;               :text "First message",
