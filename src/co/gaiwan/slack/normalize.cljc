@@ -26,7 +26,8 @@
   `:message/replies` are seqs."
   [message-map]
   (->> (vals message-map)
-       (remove :message/thread-ts)
+       (remove (fn [{:message/keys [thread-ts thread-broadcast?]}]
+                 (and thread-ts (not thread-broadcast?))))
        (map
         (fn [m]
           (if-let [reply-timestamps (:message/reply-timestamps m)]

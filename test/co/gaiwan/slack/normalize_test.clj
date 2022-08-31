@@ -1,6 +1,6 @@
 (ns co.gaiwan.slack.normalize-test
   (:require [co.gaiwan.slack.normalize :as normalize]
-            [co.gaiwan.slack.test-data.raw-events :as data]
+            [co.gaiwan.slack.test-data.raw-events :as raw-events]
             [clojure.test :refer :all]))
 
 (deftest channel-join+reaction
@@ -15,7 +15,7 @@
            :message/channel-id "C014LA21AS3"
            :message/user-id "U0168MN6HPY"
            :message/system? true}]
-         (normalize/message-seq data/channel-joins+reaction))))
+         (normalize/message-seq raw-events/channel-joins+reaction))))
 
 (deftest single-reply-test
   (is (= [{:message/timestamp "1550831541.063800"
@@ -27,8 +27,9 @@
            [{:message/timestamp "1550832057.067300"
              :message/text "/hat-tip"
              :message/channel-id "C064BA6G2"
-             :message/user-id "U82DUDVMH"}]}]
-         (normalize/message-seq data/single-reply))))
+             :message/user-id "U82DUDVMH"
+             :message/thread-ts "1550831541.063800"}]}]
+         (normalize/message-seq raw-events/single-reply))))
 
 (deftest replies+broadcast
   (is (= [{:message/timestamp "1614822402.022400"
@@ -42,24 +43,30 @@
              :message/text
              "Hmm in Compojure-api/Ring-swagger this was using describe/field function but it is a bit different here."
              :message/channel-id "C7YF1SBT3"
-             :message/user-id "U061V0GG2"}
+             :message/user-id "U061V0GG2"
+             :message/thread-ts "1614822402.022400"}
             {:message/timestamp "1614852801.028600"
              :message/text
              "Aha yes. `schema-tools.core/schema` allows attaching additional data to a schema.\n\n`(st/schema [s/Str] {:swagger/collection-format \"csv\"})`"
              :message/channel-id "C7YF1SBT3"
-             :message/user-id "U061V0GG2"}
+             :message/user-id "U061V0GG2"
+             :message/thread-ts "1614822402.022400"
+             :message/thread-broadcast? true}
             {:message/timestamp "1614853014.028900"
              :message/text
              "Does seem to be documented.\n\nImpl is here: <https://github.com/metosin/schema-tools/blob/master/src/schema_tools/swagger/core.cljc#L160-L164>\n\nKeys with :swagger ns from the additional data are merged to the properties swagger spec."
              :message/channel-id "C7YF1SBT3"
-             :message/user-id "U061V0GG2"}]}
+             :message/user-id "U061V0GG2"
+             :message/thread-ts "1614822402.022400"}]}
           {:message/timestamp "1614852801.028600"
            :message/text
            "Aha yes. `schema-tools.core/schema` allows attaching additional data to a schema.\n\n`(st/schema [s/Str] {:swagger/collection-format \"csv\"})`"
            :message/channel-id "C7YF1SBT3"
            :message/user-id "U061V0GG2"
+           :message/thread-ts "1614822402.022400"
            :message/thread-broadcast? true}]
-         (normalize/message-seq data/replies+broadcast))))
+         (normalize/message-seq raw-events/replies+broadcast))))
+
 
 (comment
   (require 'kaocha.repl)

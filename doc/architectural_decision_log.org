@@ -1,6 +1,7 @@
 #+TITLE: Clj-slack Architectural Decision Log
 
 * 1. Decoupled Sub-libraries Over Common Data Structures
+
 ** Background / Context
 
 We (Gaiwan) have at this stage built multiple applications and tools that deal

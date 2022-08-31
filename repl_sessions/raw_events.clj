@@ -10,7 +10,7 @@
             [co.gaiwan.slack.raw-archive :as raw]
             [co.gaiwan.slack.time-util :as time-util]))
 
-(def raw-slack-log "/home/arne/github/clojurians-log/logs")
+(def raw-slack-log "/home/arne/ITRevolution/devopsenterprise-slack-archive")
 
 (defn event-type [e] (get e "type"))
 (defn subtype [e] (get e "subtype"))
@@ -277,6 +277,28 @@
           (take 10000)))
         shuffle
         (take 5))))
+
+(sample-messages "message" (comp (remove #(get % "thread_ts"))
+                                 (remove subtype)))
+(sample-messages "message" (comp
+                            (filter (comp #{"bot_message"} subtype))))
+(sample-messages "message" (comp
+                            (filter (comp #{"tombstone"} subtype))))
+(sample-messages "message" (comp
+                            (filter (comp #{"message_deleted"} subtype))))
+
+(sample-messages "message" (comp
+                            (remove #(get % "attachments"))
+                            (remove #(get % "files"))
+                            (filter (comp #{"message_changed"} subtype))))
+(sort-by #(get % "ts")
+         (sample-messages "message" (comp
+                                     (filter (comp #{"1633638135.029600"}
+                                                   #(get % "thread_ts" (get % "ts")))))))
+
+(sample-messages "message" (comp
+                            (filter (comp #{"1652269908.038599"}
+                                          #(get % "ts")))))
 
 (sample-messages "reaction_added")
 ;; Seems `item_user` is the user-id of the user that posted the message that the

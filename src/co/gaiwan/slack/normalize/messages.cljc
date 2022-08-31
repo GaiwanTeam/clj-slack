@@ -4,10 +4,8 @@
   For messages we get data both from the RTM API and from the Web
   API (backfills). While these have some differences they are similar enough
   that we are generally able to produce code that can transparently handle
-  either.")
-
-(defn user-id [{:strs [user bot_id] :as event}]
-  (or user bot_id))
+  either."
+  (:require [co.gaiwan.slack.raw-event :as raw-event]))
 
 (defmulti add-event
   "Process a single event, adding it to `message-tree`, which is a (sorted) map, keyed
@@ -41,59 +39,65 @@
     message-tree))
 
 (defmethod add-event "message"
-  [message-tree {:strs [ts subtype text channel thread_ts message] :as event}]
-  (let [user (user-id event)]
+  [message-tree {:strs [subtype text channel message] :as event}]
+  (let [message-ts (raw-event/message-ts event)
+        user (raw-event/user-id event)]
     (cond
-      (or (nil? subtype) (= "bot_message" subtype))
-      (let [message {:message/timestamp ts
+      (raw-event/regular-message? event)
+      (let [message {:message/timestamp message-ts
                      :message/text text
                      :message/channel-id channel
                      :message/user-id user}]
-        (if thread_ts
-          (add-thread-reply message-tree thread_ts message)
+        (if (raw-event/reply? event)
+          (let [broadcast? (raw-event/thread-broadcast? event)
+                message (cond-> message
+                          broadcast?
+                          (assoc :message/thread-broadcast? true))]
+            (add-thread-reply message-tree (raw-event/parent-ts event) message))
           (add-message message-tree message)))
 
       (= "message_changed" subtype)
-      (if (contains? message-tree (get message "ts"))
-        (assoc-in message-tree [(get message "ts") :message/text] (get message "text"))
+      (if (contains? message-tree message-ts)
+        (assoc-in message-tree [message-ts :message/text] (get message "text"))
         message-tree)
-
-      (= "message_replied" subtype)
-      message-tree
-
-      (= "thread_broadcast" subtype)
-      (let [message {:message/timestamp ts
-                     :message/text text
-                     :message/channel-id channel
-                     :message/user-id user}]
-        (-> message-tree
-            (add-message (assoc message :message/thread-broadcast? true))
-            (add-thread-reply thread_ts message)))
 
       (#{"group_join" "group_leave" "bot_message"} subtype)
       message-tree
 
       (#{"message_deleted" "tombstone"} subtype)
-      (if (contains? message-tree ts)
-        (assoc-in message-tree [ts :message/deleted?] true)
+      (if (contains? message-tree message-ts)
+        (update message-tree message-ts
+                (fn [m]
+                  ;; Originally we just marked messages as "deleted" and
+                  ;; left it at that, but since we will propagate this
+                  ;; data to the frontend we do actually want to make
+                  ;; sure the message text is no longer accessible, so we
+                  ;; do a similar thing to what slack does and turn this
+                  ;; into a "tombstone"
+                  {:message/timestamp message-ts
+                   :message/channel-id (:message/channel-id m)
+                   :message/deleted? true
+                   :message/text "This message was deleted."
+                   :message/user-id "USLACKBOT"
+                   :message/system? true}))
         message-tree)
 
-      (#{"channel_archive" "channel_join" "channel_name" "channel_purpose" "channel_topic"} subtype)
-      (add-message message-tree {:message/timestamp ts
+      (raw-event/system-message? event)
+      (add-message message-tree {:message/timestamp message-ts
                                  :message/text text
                                  :message/channel-id channel
                                  :message/user-id user
                                  :message/system? true})
 
       (#{"me_message" "reminder_add"} subtype)
-      (add-message message-tree {:message/timestamp ts
+      (add-message message-tree {:message/timestamp message-ts
                                  :message/text text
                                  :message/channel-id channel
                                  :message/user-id user
                                  :message/emphasis? true})
 
       (= "slack_image" subtype)
-      (add-message message-tree {:message/timestamp ts
+      (add-message message-tree {:message/timestamp message-ts
                                  :message/text text
                                  :message/channel-id channel
                                  :message/user-id user
@@ -130,27 +134,3 @@
 
 (defmethod add-event "member_left_channel" [message-tree {:strs [ts user]}]
   message-tree)
-
-
-
-(comment
-  (require '[co.gaiwan.slack.archive.partition :as arch])
-
-  (def raw  (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C015DQFEGMT" "2021-10-05"))
-
-  (dotimes [i 10]
-    (time
-     (count
-      (message-seq
-       (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C015DQFEGMT" "2021-10-05")))))
-
-  (time
-   (count
-    (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C015DQFEGMT" "2021-10-05")
-    ))
-
-
-  (message-seq
-   (arch/slurp-chan-day {:dir "/tmp/gene-archive"} "C014LA21AS3" "2020-07-02"))
-
-  )

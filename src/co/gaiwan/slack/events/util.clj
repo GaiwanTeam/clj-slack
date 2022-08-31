@@ -25,6 +25,7 @@
 (defn micros->millis [micros]
   (long (/ micros 1e3)))
 
+;; TODO: remove this in favor of raw-event/event-ts
 (defn event-ts
   "Get the time the event happened, most events have a `event_ts`, the ones that
   don't generally have a `ts`. There are some exceptions for connect/disconnect
