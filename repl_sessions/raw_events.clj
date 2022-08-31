@@ -278,6 +278,13 @@
         shuffle
         (take 5))))
 
+(defn find-message [ts]
+  (sample-messages "message" (comp
+                              (filter (comp #{ts}
+                                            #(get % "ts"))))))
+
+(sample-messages "pin_removed")
+(find-message "1621258056.046800")
 (sample-messages "message" (comp (remove #(get % "thread_ts"))
                                  (remove subtype)))
 (sample-messages "message" (comp
@@ -295,10 +302,6 @@
          (sample-messages "message" (comp
                                      (filter (comp #{"1633638135.029600"}
                                                    #(get % "thread_ts" (get % "ts")))))))
-
-(sample-messages "message" (comp
-                            (filter (comp #{"1621543244.008400",}
-                                          #(get % "ts")))))
 
 (sample-messages "reaction_added")
 ;; Seems `item_user` is the user-id of the user that posted the message that the
