@@ -65,6 +65,12 @@
 (defn enrich-entries
   "Like [[enrich]], but instead of enriching all messages, only enrich the ones
   with the given timestamps."
-  [message-tree timestamps opts]
-  ;; TODO for Ariel
+  ([message-tree timestamps]
+   (enrich-entries message-tree timestamps nil))
+  ([message-tree timestamps opts]
+  ;; Update messages-tree for only those that match given timestamps
+   (update-vals
+    (filter #(some #{(-> % key)} timestamps) message-tree)
+    #(enrich-message % opts))
+   )
   )
