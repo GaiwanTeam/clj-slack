@@ -47,8 +47,11 @@ md-data/user-references
 (defn emoji-handler [[_ code] _]
   [:span.emoji (get @markdown/standard-emoji-map code code)])
 
-(defstyled slack-emoji :div
-  ,,,)
+;; (defstyled slack-emoji :div
+;;   ,,,)
+
+(defn slack-emoji [& args]
+  (into [:div] args))
 
 (markdown/markdown->hiccup
  "Hey <@U4F2A0Z8ER> <@U4F2A0Z9HR> :curly_haired_man: :cityscape:
