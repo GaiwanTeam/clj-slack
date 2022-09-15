@@ -12,3 +12,4 @@
 .lsp/
 .clj-kondo/
 .calva/
+.envrc
