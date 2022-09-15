@@ -71,7 +71,7 @@ md-data/user-references
  )
 
 
-(def api-conn (api/conn   #_(System/getenv "SLACK_API_TOKEN")))
+(def api-conn (api/conn (System/getenv "SLACK_API_TOKEN")))
 
 (def channels (api/conversations api-conn))
 (def users (api/users api-conn))
@@ -112,7 +112,7 @@ md-data/user-references
 (def enrich-entries
   (enrich/enrich-entries
    message-tree
-   ["1620134856.001100" "1620389355.003900"] ;; timesteps that only need to be update
+   ["1620134856.001100" "1620389355.003900"]
    {:users    (into {}
                     (map (juxt :user/id identity))
                     (map norm-web/user+profile (get users "members")))
@@ -125,8 +125,7 @@ md-data/user-references
 
   [(get message-tree "1632240053.000200")
    (get enrich-entries "1632240053.000200")]
-
-;; -------- update - match timesptamps list
+  ;; -------- update - match timesptamps list
   [(get message-tree "1620134856.001100")
    (get enrich-entries "1620134856.001100")]
   )
