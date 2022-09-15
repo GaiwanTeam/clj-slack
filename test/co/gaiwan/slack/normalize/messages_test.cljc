@@ -76,3 +76,18 @@
   (testing "pin event"
     (is (= [["1621258056.046800"] ["1621258056.046800"]]
            (map messages/affected-keys raw-events/pin-message)))))
+
+;; -------------------- NEW TESTS
+(def events repl-sessions.affected-messages/events)
+(def messages-tree (reduce messages/add-event {} (take 50 (remove #(get % "bot_id")
+                                                                   (get events "messages")))))
+(def k (let [users repl-sessions.affected-messages/users
+             user+profile co.gaiwan.slack.normalize.web-api/user+profile
+             new-event raw-events/message
+             ops   {:users    (into {}
+                                    (map (juxt :user/id identity))
+                                    (map user+profile (get users "members")))
+                    :org-name "gaiwanteam"}]
+  (messages/add-event messages-tree new-event ops)))
+
+(tap> k)
