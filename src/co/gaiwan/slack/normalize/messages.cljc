@@ -28,7 +28,7 @@
   by timestamp."
   (fn [message-tree event] (get event "type")))
 
-(defn add-event
+( defn add-event
   ([message-tree event]
    (if (contains? ignored-type-subtype
                   [(raw-event/type event) (raw-event/subtype event)])
@@ -37,7 +37,7 @@
   ([message-tree event opts]
    "Process the event to add whatever it contains to the message-tree, 
     then immediately augment any messages it has impacted."
-   (let [message-tree (add-event message-tree event)
+   (let [message-tree (reduce add-event message-tree event)
          timestamps   (vec 
                        (distinct 
                         (into [] cat  (map affected-keys event))))]
