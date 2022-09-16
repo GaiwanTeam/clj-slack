@@ -68,7 +68,6 @@
   ([message-tree timestamps]
    (enrich-entries message-tree timestamps nil))
   ([message-tree timestamps opts]
-   (letfn [(get-effected-messages-from-tree
-             [mt ts]
-             (update mt ts #(enrich-message % opts)))]
+   (let [get-effected-messages-from-tree (fn [mt ts]
+                                           (update mt ts #(enrich-message % opts)))]
      (reduce get-effected-messages-from-tree message-tree timestamps))))
