@@ -78,16 +78,15 @@
            (map messages/affected-keys raw-events/pin-message)))))
 
 ;; -------------------- NEW TESTS
-(def events repl-sessions.affected-messages/events)
-(def messages-tree (reduce messages/add-event {} (take 50 (remove #(get % "bot_id")
-                                                                   (get events "messages")))))
-(def k (let [users repl-sessions.affected-messages/users
-             user+profile co.gaiwan.slack.normalize.web-api/user+profile
-             new-event raw-events/message
-             ops   {:users    (into {}
-                                    (map (juxt :user/id identity))
-                                    (map user+profile (get users "members")))
-                    :org-name "gaiwanteam"}]
-  (messages/add-event messages-tree new-event ops)))
+#_(def message-tree (reduce messages/add-event {} 
+                          (take 5 (remove #(get % "bot_id")
+                                          (get repl-sessions.affected-messages/events "messages")))))
 
-(tap> k)
+(def opts {:users    (into {}
+                           (map (juxt :user/id identity))
+                           (map co.gaiwan.slack.normalize.web-api/user+profile 
+                                (get repl-sessions.affected-messages/users "members")))
+           :org-name "gaiwanteam"})
+
+;; create new msg-tree, add new event, update effected msgs
+(messages/add-event raw-events/msg-tree-test raw-events/reply-ariel opts)
