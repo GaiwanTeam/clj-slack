@@ -77,16 +77,82 @@
     (is (= [["1621258056.046800"] ["1621258056.046800"]]
            (map messages/affected-keys raw-events/pin-message)))))
 
-;; -------------------- NEW TESTS
-#_(def message-tree (reduce messages/add-event {} 
-                          (take 5 (remove #(get % "bot_id")
-                                          (get repl-sessions.affected-messages/events "messages")))))
+(deftest enrich-messages
+  (testing "new event of reply message with opts"
+  ;; reply to single message and expand both message and reply with info about the users
+    (let [users        repl-sessions.affected-messages/users
+          user+profile co.gaiwan.slack.normalize.web-api/user+profile
+          opts         {:users    (into {}
+                                        (map (juxt :user/id identity))
+                                        (map user+profile (get users "members")))
+                        :org-name "gaiwanteam"}
+          message-tree raw-events/msg-tree-test
+          event        raw-events/reply-ariel]
+      (messages/add-event message-tree event opts)))
 
-(def opts {:users    (into {}
-                           (map (juxt :user/id identity))
-                           (map co.gaiwan.slack.normalize.web-api/user+profile 
-                                (get repl-sessions.affected-messages/users "members")))
-           :org-name "gaiwanteam"})
+  (def message-tree #_(reduce
+                       messages/add-event
+                       {} (take 5 (remove #(get % "bot_id")
+                                          (get repl-sessions.affected-messages/events "messages"))))
+    {"1652772696.340349" {:message/timestamp  "1652772696.340349",
+                          :message/text       "test",
+                          :message/channel-id nil,
+                          :message/user-id    "U01FVSUGVN3"},
+     "1652772241.205779" {:message/timestamp  "1652772241.205779"
+                          :message/text       "ok"
+                          :message/channel-id nil
+                          :message/user-id    "U01FVSUGVN3"},
+     "1652253142.426959" {:message/timestamp  "1652253142.426959",
+                          :message/text       "hello",
+                          :message/channel-id nil,
+                          :message/user-id    "U01G7GP6L5B"},
+     "1652176239.817669" {:message/timestamp  "1652176239.817669"
+                          :message/text       "1"
+                          :message/channel-id nil
+                          :message/user-id    "U01FVSUGVN3"},
+     "1652176238.716789" {:message/timestamp  "1652176238.716789",
+                          :message/text       "testing",
+                          :message/channel-id nil,
+                          :message/user-id    "U01FVSUGVN3"}})
 
-;; create new msg-tree, add new event, update effected msgs
-(messages/add-event raw-events/msg-tree-test raw-events/reply-ariel opts)
+  (testing "new event of deleting message with opts"
+    (let [users        repl-sessions.affected-messages/users
+          user+profile co.gaiwan.slack.normalize.web-api/user+profile
+          opts         {:users    (into {}
+                                        (map (juxt :user/id identity))
+                                        (map user+profile (get users "members")))
+                        :org-name "gaiwanteam"}
+          event        [{"subtype"  "reminder_add",
+                         "event_ts" "1652176239.817669",
+                         "ts"       "1652176239.817669",
+                         "user"     "U01FVSUGVN3",
+                         "text"     "1",
+                         "type"     "message",
+                         "channel"  "C015FGB49UK",
+                         "team"     "TASMB716H"}
+                        {"subtype"          "message_deleted",
+                         "event_ts"         "1652269917.081500",
+                         "ts"               "1652269917.081500",
+                         "previous_message" {"subtype" "reminder_add",
+                                             "ts"      "1652176239.817669",
+                                             "user"    "U01FVSUGVN3",
+                                             "text"    "1",
+                                             "type"    "message"},
+                         "type"             "message",
+                         "hidden"           true,
+                         "deleted_ts"       "1652176239.817669",
+                         "channel"          "C015FGB49UK"}]]
+      (messages/add-event message-tree event opts))))
+
+
+(comment
+
+  (defn find-user-by-id [id]
+    (get (get {:users    (into {}
+                               (map (juxt :user/id identity))
+                               (map co.gaiwan.slack.normalize.web-api/user+profile (get repl-sessions.affected-messages/users "members")))
+               :org-name "gaiwanteam"} :users) id))
+  (find-user-by-id "U01FVSUGVN3")
+
+  ;; remove prefix in the repl to messages in the msg-tree
+  (set! *print-namespace-maps* false))
