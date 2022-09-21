@@ -2,7 +2,8 @@
   "Request things from the Slack API"
   (:require [lambdaisland.glogc :as log]
             [co.gaiwan.slack.api.middleware :as mw]
-            [co.gaiwan.slack.api.web :as web]))
+            [co.gaiwan.slack.api.web :as web]
+            [co.gaiwan.slack.normalize.web-api :as normalize-web-api]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
@@ -31,10 +32,15 @@
    key
    (simple-endpoint endpoint)))
 
-(def emoji (collection-endpoint :emoji "emoji.list"))
-(def users (collection-endpoint :members "users.list"))
+(def emoji* (simple-endpoint "emoji.list"))
+(def emoji (mw/wrap-get emoji* "emoji"))
 
-(def conversations (collection-endpoint :channels "conversations.list"))
+(def users* (collection-endpoint :members "users.list"))
+(def users (mw/wrap-coerce users* normalize-web-api/user+profile))
+
+(def conversations* (collection-endpoint :channels "conversations.list"))
+(def conversations (mw/wrap-coerce conversations* normalize-web-api/channel))
+
 (def history
   "(get-history conn {:channel channel-id})"
   (collection-endpoint :messages "conversations.history"))

@@ -65,22 +65,24 @@
         "..."))))
   ([{:strs [type subtype user text reaction message]
      :as event}]
-   (let [user (or user (get message "user"))
-         text (some-> (or text (get message "text"))
-                      (str/replace #"\R" "\\n"))]
-     (str
-      (time-util/format-debug (time-util/ts->inst (event-ts event)))
-      " "
-      (when user
-        (if (map? user)
-          (str "<" (get user "id") "> ")
-          (str "<" user "> ")))
-      "[" type
-      (when subtype (str "/" subtype))
-      "] "
-      (when text
-        text)
-      (when reaction
-        (str
-         reaction
-         " for " (get-in event ["item" "ts"])))))))
+   (if-not (event-ts event)
+     (prn-str event)
+     (let [user (or user (get message "user"))
+           text (some-> (or text (get message "text"))
+                        (str/replace #"\R" "\\n"))]
+       (str
+        (time-util/format-debug (time-util/ts->inst (event-ts event)))
+        " "
+        (when user
+          (if (map? user)
+            (str "<" (get user "id") "> ")
+            (str "<" user "> ")))
+        "[" type
+        (when subtype (str "/" subtype))
+        "] "
+        (when text
+          text)
+        (when reaction
+          (str
+           reaction
+           " for " (get-in event ["item" "ts"]))))))))
