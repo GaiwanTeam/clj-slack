@@ -76,10 +76,10 @@
   maps with metadata. We preserve the full context on the metadata for
   debugging. Leave any other type of event/message as-is."
   [msg]
-  (if-let [evt (and (= "events_api" (:type msg))
-                    (-> msg :payload :event))]
+  (if-let [evt (and (= "events_api" (get msg "type"))
+                    (get-in msg ["payload" "event"]))]
     (with-meta evt
-      (update msg :payload dissoc :event))
+      (update msg "payload" dissoc "event"))
     msg))
 
 (defn ws-connect

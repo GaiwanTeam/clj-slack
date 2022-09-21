@@ -44,15 +44,15 @@
                    opts
                    (assoc opts :limit 1000))
            resp (f conn opts*)
-           lazy-f (fn lazy-f [{:keys [ok] :as resp}]
+           lazy-f (fn lazy-f [{:strs [ok] :as resp}]
                     (if ok
-                      (let [cursor (get-in resp [:response_metadata :next_cursor])]
-                        (lazy-cat (get resp k)
+                      (let [cursor (get-in resp ["response_metadata" "next_cursor"])]
+                        (lazy-cat (get resp (name k))
                                   (when-not (empty? cursor)
                                     (lazy-f (f conn (merge opts* {:cursor cursor}))))))
                       (when error-logger
                         (error-logger resp))))]
-       (if (:ok resp)
+       (if (get resp "ok")
          (lazy-f resp)
          resp)))))
 
@@ -77,10 +77,32 @@
                (throw e)))))))))
 
 (defn wrap-result
-  "Grab the :result key from the response (= parsed json)"
+  "Grab the \"result\" key from the response (= parsed json)"
   [f]
   (fn self
     ([conn]
      (self conn nil))
     ([conn opts]
      (:result (f conn opts)))))
+
+(defn wrap-get [f k]
+  (fn self
+    ([conn]
+     (self conn nil))
+    ([conn opts]
+     (let [resp (f conn opts)]
+       (if (get resp "ok")
+         (get resp k)
+         resp)))))
+
+(defn wrap-coerce
+  "Apply a coercion function to each element in the resulting collection."
+  [f norm-fn]
+  (fn self
+    ([conn]
+     (self conn nil))
+    ([conn opts]
+     (let [resp (f conn opts)]
+       (if (sequential? resp)
+         (map norm-fn resp)
+         resp)))))
