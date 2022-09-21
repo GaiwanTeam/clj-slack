@@ -99,3 +99,8 @@
   [{:strs [type subtype]}]
   (and (= "message" type)
        (= "thread_broadcast" subtype)))
+
+(defn channel-id
+  "Get the channel this message applies to, if any."
+  [{:strs [channel]}]
+  channel)
