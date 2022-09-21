@@ -76,3 +76,15 @@
   (testing "pin event"
     (is (= [["1621258056.046800"] ["1621258056.046800"]]
            (map messages/affected-keys raw-events/pin-message)))))
+
+
+(comment
+  (defn find-user-by-id [id]
+    (get (get {:users    (into {}
+                               (map (juxt :user/id identity))
+                               (map co.gaiwan.slack.normalize.web-api/user+profile (get repl-sessions.affected-messages/users "members")))
+               :org-name "gaiwanteam"} :users) id))
+  (find-user-by-id "U01FVSUGVN3")
+
+  ;; remove prefix in the repl to messages in the msg-tree
+  (set! *print-namespace-maps* false))

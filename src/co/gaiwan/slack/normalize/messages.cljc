@@ -27,7 +27,10 @@
   by timestamp."
   (fn [message-tree event] (get event "type")))
 
-(defn add-event [message-tree event]
+(defn add-event
+  "Process the event to add whatever it contains to the message-tree,
+   then immediately augment any messages it has impacted."
+  [message-tree event]
   (if (contains? ignored-type-subtype
                  [(raw-event/type event) (raw-event/subtype event)])
     message-tree

@@ -19,9 +19,13 @@
         (sorted-map)
         raw-events/single-reply)
 
+(def json-demo-data-path
+  "/home/ariel-alexi/Desktop/clojurians-log-demo-data/logs/2018-02-01.txt"
+  #_"/home/arne/github/clojurians-log-demo-data/logs/2018-02-01.txt")
+
 (reduce messages/add-event
         (sorted-map)
-        (jsonl/slurp-jsonl "/home/arne/github/clojurians-log-demo-data/logs/2018-02-01.txt"))
+        (jsonl/slurp-jsonl json-demo-data-path))
 
 ;; => {"1602745198.022400"
 ;;     #:message{:timestamp "1602745198.022400",
@@ -67,7 +71,7 @@ md-data/user-references
  )
 
 
-(def api-conn (api/conn   #_(System/getenv "SLACK_API_TOKEN")))
+(def api-conn (api/conn (System/getenv "SLACK_API_TOKEN")))
 
 (def channels (api/conversations api-conn))
 (def users (api/users api-conn))
@@ -75,8 +79,11 @@ md-data/user-references
 (def events
   (api/history api-conn
                {:channel
-                (some #(when (= "random" (:name_normalized %))
-                         (:id %)) channels)}))
+                (some #(when (= "random" (get % "name_normalized"))
+                           (get % "id")) (get channels "channels")) ; event's keys are string and not keywords"
+                #_(some #(when (= "random" (:name_normalized %))
+                         (:id %)) channels) ; => {"response_metadata" {"messages" ["[ERROR] missing required field: channel"]}, "error" "invalid_arguments", "ok" false}
+                }))
 
 (tap> events)
 
@@ -101,3 +108,24 @@ md-data/user-references
 [
  (get message-tree "1620399358.006300")
  (get enriched "1620399358.006300")]
+
+(def enrich-entries
+  (enrich/enrich-entries
+   message-tree
+   ["1620134856.001100" "1620389355.003900"]
+   {:users    (into {}
+                    (map (juxt :user/id identity))
+                    (map norm-web/user+profile (get users "members")))
+    :org-name "gaiwanteam"}))
+
+(comment
+  ;; ------- no update - doesn't match timestamps list
+  [(get message-tree "1620134930.001400")
+   (get enrich-entries "1620134930.001400")]
+
+  [(get message-tree "1632240053.000200")
+   (get enrich-entries "1632240053.000200")]
+  ;; -------- update - match timesptamps list
+  [(get message-tree "1620134856.001100")
+   (get enrich-entries "1620134856.001100")]
+  )

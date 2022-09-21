@@ -390,3 +390,18 @@
     "type" "pin_added",
     "pinned_info"
     {"pinned_by" "UB5S3V9F0", "channel" "C015DQFEGMT", "pinned_ts" 1621265782}}])
+
+
+(def simple-message-tree
+  {"1652772696.340349" {:message/timestamp "1652772696.340349"
+                        :message/text "test"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U01FVSUGVN3"}
+   "1652253142.426959" {:message/timestamp "1652253142.426959"
+                        :message/text "hello"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U01G7GP6L5B"}
+   "1621508880.437600" {:message/timestamp "1621508880.437600"
+                        :message/text "testing father"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U03280RER7B"}})
