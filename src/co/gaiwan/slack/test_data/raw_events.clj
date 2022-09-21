@@ -392,36 +392,16 @@
     {"pinned_by" "UB5S3V9F0", "channel" "C015DQFEGMT", "pinned_ts" 1621265782}}])
 
 
-(def msg-tree-test
-  {"1652772696.340349" #:message{:timestamp  "1652772696.340349"
-                                  :text       "test"
-                                  :channel-id nil
-                                  :user-id    "U01S4F9HW01"},
-    "1652253142.426959" #:message{:timestamp  "1652253142.426959"
-                                  :text       "hello"
-                                  :channel-id nil
-                                  :user-id    "U01S4F9HW01"},
-    "1621508880.437600" #:message{:timestamp  "1621508880.437600"
-                                  :text       "testing father"
-                                  :channel-id "C064BA6G2"
-                                  :user-id    "U03280RER7B"}})
-
-(def reply-ariel
-  [{"event_ts" "1621508880.437600"
-    "ts" "1621508880.437600"
-    "user" "U03280RER7B" ;; Ariel's user id
-    "client_msg_id" "73aca9c6-6c33-4de3-a5a0-86847f1c224e"
-    "text" "testing father"
-    "type" "message"
-    "channel" "C064BA6G2"
-    "team" "T03RZGPFR"}
-{   "event_ts"      "1750831541.063800"
-   "ts"            "1750831541.063800"
-   "user"          "U02UW06M547" ;; Joshua's user id
-   "client_msg_id" "79f99599-b72f-4b25-a6ba-2c7686f3600c"
-   "text"          "this is finally updated!!!"
-   "thread_ts"     "1621508880.437600"
-   "type"          "message"
-   "channel"       "C064BA6G2"
-   "team"          "T03RZGPFR"}
-   ])
+(def simple-message-tree
+  {"1652772696.340349" {:message/timestamp "1652772696.340349"
+                        :message/text "test"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U01FVSUGVN3"}
+   "1652253142.426959" {:message/timestamp "1652253142.426959"
+                        :message/text "hello"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U01G7GP6L5B"}
+   "1621508880.437600" {:message/timestamp "1621508880.437600"
+                        :message/text "testing father"
+                        :message/channel-id "C064BA6G2"
+                        :message/user-id "U03280RER7B"}})

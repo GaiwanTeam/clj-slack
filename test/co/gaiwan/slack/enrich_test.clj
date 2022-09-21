@@ -40,3 +40,31 @@
            :org-name "gaiwanteam"
            :handlers {:user-id user-id-handler
                       :emoji emoji-handler}}))))
+
+(deftest enrich-entries-test
+  (is (= {"1652772696.340349" {:message/timestamp "1652772696.340349"
+                               :message/text "test"
+                               :message/channel-id "C064BA6G2"
+                               :message/user-id "U01FVSUGVN3"}
+          "1652253142.426959" {:message/timestamp "1652253142.426959"
+                               :message/text "hello"
+                               :message/channel-id "C064BA6G2"
+                               :message/user-id "U01G7GP6L5B"}
+          "1621508880.437600" {:message/timestamp "1621508880.437600"
+                               :message/hiccup ["testing father"]
+                               :user/name "ariel"
+                               :user-profile/link "https://gaiwanteam.slack.com/team/U03280RER7B"
+                               :user-profile/image-48 "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_48.png"
+                               :message/channel-id "C064BA6G2"
+                               :message/time "11:05:00"
+                               :channel/link "https://gaiwanteam.slack.com/archives/C064BA6G2"
+                               :user-profile/display-name "Ariel Alexi"
+                               :message/permalink "https://gaiwanteam.slack.com/archives/C064BA6G2/p1621508880437600"
+                               :message/user-id "U03280RER7B"
+                               :user/real-name "Ariel Alexi"}}
+         (enrich/enrich-entries raw-events/simple-message-tree
+                                ["1621508880.437600"]
+                                {:users (into {}
+                                              (map (juxt :user/id identity))
+                                              entities/users-normalized)
+                                 :org-name "gaiwanteam"}))))

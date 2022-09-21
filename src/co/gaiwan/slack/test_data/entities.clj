@@ -59,4 +59,31 @@
     :user-profile/image-512 "https://avatars.slack-edge.com/2020-12-07/1548912027190_d7b9434a78f197884eb7_512.jpg",
     :user-profile/real-name "Arne Brasseur",
     :user/admin? true,
-    :user-profile/image-24 "https://avatars.slack-edge.com/2020-12-07/1548912027190_d7b9434a78f197884eb7_24.jpg"}])
+    :user-profile/image-24 "https://avatars.slack-edge.com/2020-12-07/1548912027190_d7b9434a78f197884eb7_24.jpg"}
+
+   {:user-profile/display-name-normalized "Ariel Alexi",
+    :user/owner? false,
+    :user/name "ariel",
+    :user/id "U03280RER7B",
+    :user-profile/real-name-normalized "Ariel Alexi",
+    :user-profile/avatar-hash "07a3c0e40679",
+    :user-profile/email nil,
+    :user-profile/image-32
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_32.png",
+    :user-profile/image-48
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_48.png",
+    :user-profile/display-name "Ariel Alexi",
+    :user-profile/image-72
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_72.png",
+    :user-profile/image-192
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_192.png",
+    :user/real-name "Ariel Alexi",
+    :user-profile/image-512
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_512.png",
+    :user-profile/real-name "Ariel Alexi",
+    :user/admin? false,
+    :user-profile/image-24
+    "https://avatars.slack-edge.com/2022-02-07/3060345905878_07a3c0e40679cd03aec1_24.png"}])
+
+(def channels-normalized
+  [,,,])

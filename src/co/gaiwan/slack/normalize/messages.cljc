@@ -5,8 +5,7 @@
   API (backfills). While these have some differences they are similar enough
   that we are generally able to produce code that can transparently handle
   either."
-  (:require [co.gaiwan.slack.raw-event :as raw-event]
-            [co.gaiwan.slack.enrich :as enrich]))
+  (:require [co.gaiwan.slack.raw-event :as raw-event]))
 
 (def ignored-type-subtype
   "Type/subtype combinations which we currently simply ignore"
@@ -28,20 +27,14 @@
   by timestamp."
   (fn [message-tree event] (get event "type")))
 
-( defn add-event
-  ([message-tree event]
-   (if (contains? ignored-type-subtype
-                  [(raw-event/type event) (raw-event/subtype event)])
-     message-tree
-     (-add-event message-tree event)))
-  ([message-tree event opts]
-   "Process the event to add whatever it contains to the message-tree, 
-    then immediately augment any messages it has impacted."
-   (let [message-tree (reduce add-event message-tree event)
-         timestamps   (vec 
-                       (distinct 
-                        (into [] cat  (map affected-keys event))))]
-     (enrich/enrich-entries message-tree timestamps opts))))
+(defn add-event
+  "Process the event to add whatever it contains to the message-tree,
+   then immediately augment any messages it has impacted."
+  [message-tree event]
+  (if (contains? ignored-type-subtype
+                 [(raw-event/type event) (raw-event/subtype event)])
+    message-tree
+    (-add-event message-tree event)))
 
 (defmethod -add-event :default [message-tree _] message-tree)
 
