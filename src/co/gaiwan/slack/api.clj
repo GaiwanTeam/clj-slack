@@ -3,7 +3,8 @@
   (:require [lambdaisland.glogc :as log]
             [co.gaiwan.slack.api.middleware :as mw]
             [co.gaiwan.slack.api.web :as web]
-            [co.gaiwan.slack.normalize.web-api :as normalize-web-api]))
+            [co.gaiwan.slack.domain.user :as domain-user]
+            [co.gaiwan.slack.domain.channel :as domain-channel]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
@@ -36,14 +37,15 @@
 (def emoji (mw/wrap-get emoji* "emoji"))
 
 (def users* (collection-endpoint :members "users.list"))
-(def users (mw/wrap-coerce users* normalize-web-api/user+profile))
+(def users (mw/wrap-coerce users* domain-user/raw->user))
 
 (def conversations* (collection-endpoint :channels "conversations.list"))
-(def conversations (mw/wrap-coerce conversations* normalize-web-api/channel))
+(def conversations (mw/wrap-coerce conversations* domain-channel/raw->channel))
 
 (def history
-  "(get-history conn {:channel channel-id})"
+  "(history conn {:channel channel-id})"
   (collection-endpoint :messages "conversations.history"))
+
 (def replies (collection-endpoint :messages "conversations.replies"))
 
 (def pins (collection-endpoint :items "pins.list"))
