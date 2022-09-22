@@ -42,8 +42,9 @@
 (def conversations (mw/wrap-coerce conversations* normalize-web-api/channel))
 
 (def history
-  "(get-history conn {:channel channel-id})"
+  "(history conn {:channel channel-id})"
   (collection-endpoint :messages "conversations.history"))
+
 (def replies (collection-endpoint :messages "conversations.replies"))
 
 (def pins (collection-endpoint :items "pins.list"))
