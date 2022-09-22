@@ -39,7 +39,7 @@
   we simply return `:error`."
   [response]
   (or (= :error response)
-      (and (map? response) (false? (:ok response)))))
+      (and (map? response) (false? (or (:ok response) (get response "ok"))))))
 
 (defn- send-get-request
   "Sends a GET http request with formatted params.
