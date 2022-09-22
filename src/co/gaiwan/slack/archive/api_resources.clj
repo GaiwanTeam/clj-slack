@@ -1,11 +1,12 @@
 (ns co.gaiwan.slack.archive.api-resources
   "Handle the resources within a partitioned archive which are retrieved via the
   web API: users, channels, emoji."
-  (:require [clojure.java.io :as io]
+  (:require [charred.api :as charred]
+            [clojure.java.io :as io]
             [co.gaiwan.json-lines :as jsonl]
             [co.gaiwan.slack.api :as slack-api]
-            [co.gaiwan.slack.normalize.web-api :as norm-web]
-            [charred.api :as charred]))
+            [co.gaiwan.slack.domain.channel :as domain-channel]
+            [co.gaiwan.slack.domain.user :as domain-user]))
 
 (defn fetch-users
   "Fetch users via the web API, saving them to a `users.jsonl` json-lines file at
@@ -46,7 +47,7 @@
       (let [users (jsonl/slurp-jsonl user-file)]
         (assoc arch
                :users (into {}
-                            (comp (map norm-web/user+profile)
+                            (comp (map domain-user/raw->user)
                                   (map (juxt :user/id identity)))
                             users)))
       arch)))
@@ -58,7 +59,7 @@
   (let [channel-file (io/file dir "channels.jsonl")]
     (if (.exists channel-file)
       (assoc archive :channels (into {}
-                                     (comp (map norm-web/channel)
+                                     (comp (map domain-channel/raw->channel)
                                            (map (juxt :channel/id identity)))
                                      (jsonl/slurp-jsonl channel-file)))
       archive)))

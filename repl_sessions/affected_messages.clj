@@ -1,15 +1,15 @@
 (ns repl-sessions.affected-messages
-  (:require [co.gaiwan.slack.normalize.messages :as messages]
-            [co.gaiwan.slack.test-data.raw-events :as raw-events]
-            [co.gaiwan.slack.markdown :as markdown]
-            [co.gaiwan.slack.test-data.markdown :as md-data]
-            [co.gaiwan.slack.test-data.entities :as entity-data]
-            [co.gaiwan.slack.markdown.parser :as parser]
-            [co.gaiwan.slack.enrich :as enrich]
+  (:require [co.gaiwan.json-lines :as jsonl]
             [co.gaiwan.slack.api :as api]
-            [co.gaiwan.slack.normalize.web-api :as norm-web]
-            [co.gaiwan.json-lines :as jsonl]
-            ))
+            [co.gaiwan.slack.domain.channel :as domain-channel]
+            [co.gaiwan.slack.domain.user :as domain-user]
+            [co.gaiwan.slack.enrich :as enrich]
+            [co.gaiwan.slack.markdown :as markdown]
+            [co.gaiwan.slack.markdown.parser :as parser]
+            [co.gaiwan.slack.normalize.messages :as messages]
+            [co.gaiwan.slack.test-data.entities :as entity-data]
+            [co.gaiwan.slack.test-data.markdown :as md-data]
+            [co.gaiwan.slack.test-data.raw-events :as raw-events]))
 
 ;; https://linear.app/gaiwan/issue/ITR-41
 
@@ -87,7 +87,7 @@ md-data/user-references
 
 (tap> events)
 
-(tap> (map norm-web/user+profile (get users "members") ))
+(tap> (map domain-user/raw->user (get users "members") ))
 
 (tap> users)
 
@@ -101,7 +101,7 @@ md-data/user-references
   (enrich/enrich message-tree
                  {:users (into {}
                                (map (juxt :user/id identity))
-                               (map norm-web/user+profile (get users "members") ))
+                               (map domain-user/raw->user (get users "members") ))
                   :org-name "gaiwanteam"}
                  ))
 
@@ -115,7 +115,7 @@ md-data/user-references
    ["1620134856.001100" "1620389355.003900"]
    {:users    (into {}
                     (map (juxt :user/id identity))
-                    (map norm-web/user+profile (get users "members")))
+                    (map domain-user/raw->user (get users "members")))
     :org-name "gaiwanteam"}))
 
 (comment
