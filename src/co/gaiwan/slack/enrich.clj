@@ -11,6 +11,7 @@
 (defn user-profile-link [org-name user-id]
   (str "https://" org-name ".slack.com/team/" user-id))
 
+;; TODO: move to domain.message
 (defn actual-display-name [{:message/keys [user-id]}
                            {:user/keys [name real-name]
                             :user-profile/keys [display-name]}]
