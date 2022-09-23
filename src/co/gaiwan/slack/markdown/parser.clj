@@ -2,8 +2,7 @@
   "Parser for Slack's dialect of Markdown.
 
   Hand-rolled for performance."
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+  (:require [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
 

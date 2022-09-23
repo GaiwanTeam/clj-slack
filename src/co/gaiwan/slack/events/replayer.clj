@@ -19,7 +19,11 @@
   (add-listener [this watch-key listener]
     (swap! listeners assoc watch-key listener))
   (remove-listener [this watch-key]
-    (swap! listeners dissoc watch-key)))
+    (swap! listeners dissoc watch-key))
+
+  java.io.Closeable
+  (close [this]
+    (reset! sorted-events [])))
 
 ;; Timestamps on the Slack API:
 ;; The timestamps used by the Slack API are strings representing a
