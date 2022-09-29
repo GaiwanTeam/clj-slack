@@ -9,10 +9,13 @@
   (:require [co.gaiwan.slack.domain.user :refer [?User]]
             [co.gaiwan.slack.domain.channel :refer [?Channel]]
             [co.gaiwan.slack.raw-event :as raw-event]
-            [co.gaiwan.slack.normalize.messages :as normalize-messages]))
+            [co.gaiwan.slack.normalize.messages :as normalize-messages]
+            [co.gaiwan.slack.enrich :as enrich]))
 
 (def ?WorkspaceStore
   [:map
+   [:workspace-store/workspace string?]
+   [:workspace-store/markdown-handlers map?]
    [:workspace-store/users
     [:map-of string? ?User]]
    [:workspace-store/emoji
@@ -20,10 +23,12 @@
    [:workspace-store/channels
     [:map-of string? ?Channel]]])
 
-(defn new-store []
+(defn new-store [{:keys [workspace markdown-handlers]}]
   {:workspace-store/users {}
    :workspace-store/emoji {}
-   :workspace-store/channels {}})
+   :workspace-store/channels {}
+   :workspace-store/workspace workspace
+   :workspace-store/markdown-handlers markdown-handlers})
 
 (defn channel-message-tree [store channel-id]
   (get-in store [:workspace-store/channels channel-id :channel/message-tree]))
@@ -65,3 +70,14 @@
                     :channel/message-tree]
              (fnil into (sorted-map))
              (index-by :message/timestamp messages)))
+
+(defn enrich-all [store]
+  (update store
+          :workspace-store/channels
+          update-vals
+          (fn [channel]
+            (update
+             channel :channel/message-tree
+             enrich/enrich {:users    (:workspace-store/users store)
+                            :handlers (:workspace-store/markdown-handlers store)
+                            :org-name (:workspace-store/workspace store)}))))
