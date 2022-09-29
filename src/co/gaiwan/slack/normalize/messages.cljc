@@ -57,15 +57,21 @@
     message-tree))
 
 (defmethod -add-event "message"
-  [message-tree {:strs [subtype text channel message] :as event}]
+  [message-tree {:strs [subtype text channel message reactions] :as event}]
   (let [message-ts (raw-event/message-ts event)
         user (raw-event/user-id event)]
     (cond
       (raw-event/regular-message? event)
-      (let [message {:message/timestamp message-ts
-                     :message/text text
-                     :message/channel-id channel
-                     :message/user-id user}]
+      (let [message (cond-> {:message/timestamp message-ts
+                             :message/text text
+                             :message/channel-id channel
+                             :message/user-id user}
+                      reactions
+                      (assoc :message/reactions
+                             (into {}
+                                   (map (fn [{:strs [name count]}]
+                                          [name count]))
+                                   reactions)))]
         (if (raw-event/reply? event)
           (let [broadcast? (raw-event/thread-broadcast? event)
                 message (cond-> message
