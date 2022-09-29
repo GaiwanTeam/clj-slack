@@ -5,10 +5,10 @@
   ;; Data formats
   metosin/jsonista      {:mvn/version "0.3.6"}
   lambdaisland/uri      {:mvn/version "1.13.95"}
-  com.cnuernber/charred {:mvn/version "1.012"}
+  com.cnuernber/charred {:mvn/version "1.014"}
 
   ;; Time
-  clojure.java-time/clojure.java-time {:mvn/version "0.3.3"}
+  clojure.java-time/clojure.java-time {:mvn/version "1.1.0"}
 
   ;; Http/WS
   hato/hato                         {:mvn/version "0.8.2"}
@@ -18,9 +18,9 @@
   io.pedestal/pedestal.log {:mvn/version "0.5.10"}
   com.lambdaisland/glogi   {:mvn/version "1.1.144"}
 
-  org.slf4j/jul-to-slf4j         {:mvn/version "2.0.2"}
-  org.slf4j/jcl-over-slf4j       {:mvn/version "2.0.2"}
-  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "2.0.2"}
+  org.slf4j/jul-to-slf4j         {:mvn/version "2.0.3"}
+  org.slf4j/jcl-over-slf4j       {:mvn/version "2.0.3"}
+  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "2.0.3"}
   ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.4.1"}}
 
  :aliases

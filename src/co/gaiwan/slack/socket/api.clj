@@ -33,6 +33,7 @@
 (defn ws-send
   "Send a websocket back, takes EDN, will serialize to JSON"
   [^WebSocketClient ws-client msg]
+  (log/trace :websocket/sending msg)
   (.send ws-client (json/write-json-str msg)))
 
 (defn ws-connect*
@@ -54,8 +55,11 @@
                  (on-error this ex))
                (onMessage [message]
                  (log/trace :websocket/message message)
-                 (let [{:keys [envelope_id payload] :as parsed}
-                       (json/read-json message :key-fn (if keywordize? keyword identity))]
+                 (let [parsed (json/read-json
+                               message
+                               :key-fn (if keywordize? keyword identity))
+                       envelope_id  (get parsed "envelope_id"
+                                         (get parsed :envelope_id))]
                    (on-message this parsed)
                    (when envelope_id
                      ;; slack requires acknowledgement like this
@@ -117,8 +121,12 @@
                                                 (vals @listeners)))
                                :on-message (fn [conn msg]
                                              (let [msg (unwrap-message msg)]
-                                               (run! #(% msg)
-                                                     (vals @listeners)))
+                                               (doseq [[k f] @listeners]
+                                                 (try
+                                                   (f msg)
+                                                   (catch Exception e
+                                                     (log/error :listener/threw {:listener f}
+                                                                :exception e)))))
                                              (when (= "disconnect" (:type msg))
                                                (reconnect!)))
                                :on-error (fn [conn err]
