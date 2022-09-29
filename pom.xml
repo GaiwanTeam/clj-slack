@@ -1,47 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>co.gaiwan</groupId>
   <artifactId>clj-slack</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
-  <name>co.gaiwan/clj-slack</name>
-  <description>FIXME: my new application.</description>
-  <url>https://github.com/co.gaiwan/clj-slack</url>
-  <licenses>
-    <license>
-      <name>Eclipse Public License</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <name>Laurence</name>
-    </developer>
-  </developers>
+  <version>0.0.107</version>
+  <name>clj-slack</name>
+  <description></description>
+  <url>https://github.com/lambdaisland/clj-slack</url>
+  <inceptionYear>2021</inceptionYear>
+  <organization>
+    <name>Lambda Island</name>
+    <url>https://lambdaisland.com</url>
+  </organization>
+  <properties>
+    <project class="build sourceEncoding">UTF-8</project>
+  </properties>
   <scm>
-    <url>https://github.com/co.gaiwan/clj-slack</url>
-    <connection>scm:git:git://github.com/co.gaiwan/clj-slack.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/co.gaiwan/clj-slack.git</developerConnection>
-    <tag>HEAD</tag>
+    <url>https://github.com/lambdaisland/clj-slack</url>
+    <connection>scm:git:git://github.com/lambdaisland/clj-slack.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/lambdaisland/clj-slack.git</developerConnection>
+    <tag>78e38cbfd6b0d71c04876fe4e75e692a41332004</tag>
   </scm>
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
-      <version>1.10.1</version>
+      <version>1.11.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lambdaisland</groupId>
+      <artifactId>glogi</artifactId>
+      <version>1.1.144</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>2.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>io.pedestal</groupId>
+      <artifactId>pedestal.log</artifactId>
+      <version>0.5.10</version>
+    </dependency>
+    <dependency>
+      <groupId>hato</groupId>
+      <artifactId>hato</artifactId>
+      <version>0.8.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>2.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>clojure.java-time</groupId>
+      <artifactId>clojure.java-time</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.java-websocket</groupId>
+      <artifactId>Java-WebSocket</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+    <dependency>
+      <groupId>metosin</groupId>
+      <artifactId>jsonista</artifactId>
+      <version>0.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>lambdaisland</groupId>
+      <artifactId>uri</artifactId>
+      <version>1.13.95</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cnuernber</groupId>
+      <artifactId>charred</artifactId>
+      <version>1.014</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <version>2.0.3</version>
     </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src</directory>
+      </resource>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <git-revision>78e38cbfd6b0d71c04876fe4e75e692a41332004</git-revision>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <repositories>
     <repository>
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
-    </repository>
-    <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
   </repositories>
   <distributionManagement>
