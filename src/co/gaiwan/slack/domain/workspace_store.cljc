@@ -16,12 +16,9 @@
   [:map
    [:workspace-store/workspace string?]
    [:workspace-store/markdown-handlers map?]
-   [:workspace-store/users
-    [:map-of string? ?User]]
-   [:workspace-store/emoji
-    [:map-of string? string?]]
-   [:workspace-store/channels
-    [:map-of string? ?Channel]]])
+   [:workspace-store/users [:map-of string? ?User]]
+   [:workspace-store/emoji [:map-of string? string?]]
+   [:workspace-store/channels [:map-of string? ?Channel]]])
 
 (defn new-store [{:keys [workspace markdown-handlers]}]
   {:workspace-store/users {}
@@ -56,13 +53,16 @@
                               (assoc %2 "channel" channel-id))
           store events))
 
-(defn add-raw-event [store event]
-  (if-let [channel-id (raw-event/channel-id event)]
-    (add-channel-event store channel-id event)
-    ;; TODO: handle user and channel add/change/delete events
-    store)
-  ;; TODO: return store and affected keys
-  )
+(defn add-raw-event
+  "adding an event to a store and return a map of the store and the affected keys" 
+  [store event]
+  {:store         (if-let [channel-id (raw-event/channel-id event)]
+                    #_(add-channel-event store channel-id event) 
+                    (swap! store add-channel-event channel-id event)
+                      ;; TODO: handle user and channel add/change/delete events
+                    store)
+   :affected-keys (normalize-messages/affected-keys event)
+   })
 
 (defn add-channel-messages [store channel-id messages]
   (update-in store [:workspace-store/channels
@@ -71,13 +71,35 @@
              (fnil into (sorted-map))
              (index-by :message/timestamp messages)))
 
-(defn enrich-all [store]
+(defn update-channels [store f & args]
   (update store
           :workspace-store/channels
           update-vals
           (fn [channel]
-            (update
-             channel :channel/message-tree
-             enrich/enrich {:users    (:workspace-store/users store)
-                            :handlers (:workspace-store/markdown-handlers store)
-                            :org-name (:workspace-store/workspace store)}))))
+            (apply f channel args))))
+
+(defn enrich-all [store]
+  (update-channels
+   store
+   (fn [channel]
+     (update
+      channel :channel/message-tree
+      (fn [message-tree]
+        (enrich/enrich message-tree
+                       {:users    (:workspace-store/users store)
+                        :handlers (:workspace-store/markdown-handlers store)
+                        :org-name (:workspace-store/workspace store)}))))))
+
+(defn enrich-entries [store message-ids]
+  (update-channels
+   store
+   (fn [channel]
+     (update
+      channel :channel/message-tree
+      (fn [message-tree]
+        (enrich/enrich-entries 
+         message-tree
+         message-ids
+         {:users    (:workspace-store/users store)
+          :handlers (:workspace-store/markdown-handlers store)
+          :org-name (:workspace-store/workspace store)}))))))
