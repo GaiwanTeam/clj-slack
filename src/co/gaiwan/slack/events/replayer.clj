@@ -1,13 +1,15 @@
 (ns co.gaiwan.slack.events.replayer
   "EventSource that replays pre-recorded Slack events."
-  (:require [clojure.math :as math]
-            [clojure.pprint :as pprint]
-            [clojure.string :as str]
-            [clojure.walk :as walk]
-            [co.gaiwan.json-lines :as jsonl]
-            [co.gaiwan.slack.protocols :as protocols]
-            [co.gaiwan.slack.events.util :as util])
-  (:import (java.util.concurrent TimeUnit)))
+  (:require
+   [clojure.string :as str]
+   [clojure.walk :as walk]
+   [co.gaiwan.json-lines :as jsonl]
+   [co.gaiwan.slack.events.util :as util]
+   [co.gaiwan.slack.protocols :as protocols]
+   [co.gaiwan.slack.raw-event :as raw-event]
+   [co.gaiwan.slack.time-util :as time-util])
+  (:import
+   (java.time ZoneOffset)))
 
 (defrecord ReplayerEventSource
     [sorted-events                      ; Atom. Sorted sequence of events.
@@ -46,7 +48,7 @@
    (fn [form]
      (if-not (string? form)
        form
-       (if-let [micros (util/ts->micros form)]
+       (if-let [micros (time-util/ts->micros form)]
          (util/micros->ts (+ micros offset-us))
          form)))
    event))
@@ -156,7 +158,56 @@
           (Thread/sleep ,,,) ;; FIXME
           (recur (now-micros)))))))
 
+(defn seek!
+  "Seek the replayer to a time, given as a 'HH:MM' string. Use this before
+  starting the replayer."
+  [replayer time]
+  (let [event (first @(:sorted-events replayer))
+        inst (time-util/ts->inst (raw-event/event-ts event))
+        [hh mm] (map #(Long/parseLong %)
+                     (str/split time #":"))
+        ts (time-util/inst->ts
+            (.. inst
+                (atZone ZoneOffset/UTC)
+                (withHour hh)
+                (withMinute mm)
+                toInstant
+                ))]
+    (swap! (:sorted-events replayer)
+           (fn [es]
+             (doall
+              (drop-while (fn [event]
+                            (< (compare (raw-event/event-ts event) ts) 0))
+                          es))))
+    (assoc replayer :offset-us
+           (- (now-micros)
+              (time-util/ts->micros ts)))))
+
 (comment
+
+  (def rrr
+    (from-json "/home/arne/ITRevolution/devopsenterprise-slack-archive/logs/2022-05-11.txt"
+               {}))
+  (compare   "1652230067.075500" "1652263247.075500")
+  (compare 1 2)
+  (def rr2 (seek! rrr "10:00"))
+  (time-util/ts->inst
+   (raw-event/event-ts
+    (first @(:sorted-events rrr))))
+  (time-util/ts->inst
+   (raw-event/event-ts
+    (first @(:sorted-events rr2))))
+
+  [(:offset-us rrr)
+   (:offset-us rr2)
+   (double
+    (/ (-
+        (:offset-us rrr)
+        (:offset-us rr2))
+       1e6
+       60
+       60))]
+
   (replay! (from-events [{"ts" "0000000001.000000"}
                          {"ts" "0000000003.000000"}
                          {"ts" "0000000006.000000"}
