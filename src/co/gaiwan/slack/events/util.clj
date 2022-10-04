@@ -5,14 +5,6 @@
   (:import
    (java.time.format DateTimeFormatter)))
 
-(def ts-regex #"(\d{10})\.(\d{6})")
-
-(defn ts->micros
-  "If `s` is a ts string, converts it to Long. Else, returns nil."
-  [s]
-  (when-let [[_ seconds micros] (re-find ts-regex s)]
-    (parse-long (str seconds micros))))
-
 (defn micros->ts
   "Converts `micros` into a timestamp string."
   [micros]
@@ -36,7 +28,7 @@
 (defn event-ts-micros
   "Derives `event` time (in microseconds) from its timestamp."
   [event]
-  (ts->micros (event-ts event)))
+  (time-util/ts->micros (event-ts event)))
 
 (def empty-event-set
   "Sorted set, any events added will be kept sorted in event_ts order."

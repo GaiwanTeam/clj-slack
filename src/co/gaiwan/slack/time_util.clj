@@ -38,10 +38,14 @@
   Example: from \"1433399521.000490\" to
   #inst \"2015-06-04T06:32:01.000490Z\"."
   ^Instant [ts]
-  (let [[seconds micros] (map #(Double/parseDouble %)
-                              (str/split ts #"\."))
-        inst (Instant/ofEpochSecond seconds (* 1e3 micros))]
+  (let [[seconds nanos] (map #(Long/parseLong %)
+                             (str/split ts #"\."))
+        inst (Instant/ofEpochSecond seconds nanos)]
     inst))
+
+(defn inst->ts [inst]
+  (str (.getEpochSecond inst)
+       (format ".%06d" (.getNano inst))))
 
 (defn ts->zoned-date-time
   "Converts a Slack timestamp into a ZonedDateTime.
@@ -54,6 +58,14 @@
   (.withZoneSameInstant
    (ZonedDateTime/ofInstant (ts->inst ts) UTC)
    zone-id))
+
+(def ts-regex #"(\d{10})\.(\d{6})")
+
+(defn ts->micros
+  "If `s` is a ts string, converts it to Long. Else, returns nil."
+  [s]
+  (when-let [[_ seconds micros] (re-find ts-regex s)]
+    (parse-long (str seconds micros))))
 
 (defn format-inst-id
   "Formats an Instant into an id used to link to individual messages."
