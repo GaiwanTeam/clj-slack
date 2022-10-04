@@ -54,15 +54,13 @@
           store events))
 
 (defn add-raw-event
-  "adding an event to a store and return a map of the store and the affected keys" 
+  "Add a raw event to the store, updating the relevant message in the right
+  channel."
   [store event]
-  {:store         (if-let [channel-id (raw-event/channel-id event)]
-                    #_(add-channel-event store channel-id event) 
-                    (swap! store add-channel-event channel-id event)
-                      ;; TODO: handle user and channel add/change/delete events
-                    store)
-   :affected-keys (normalize-messages/affected-keys event)
-   })
+  (if-let [channel-id (raw-event/channel-id event)]
+    (add-channel-event store channel-id event)
+    ;; TODO: handle user and channel add/change/delete events
+    store))
 
 (defn add-channel-messages [store channel-id messages]
   (update-in store [:workspace-store/channels
@@ -97,7 +95,7 @@
      (update
       channel :channel/message-tree
       (fn [message-tree]
-        (enrich/enrich-entries 
+        (enrich/enrich-entries
          message-tree
          message-ids
          {:users    (:workspace-store/users store)

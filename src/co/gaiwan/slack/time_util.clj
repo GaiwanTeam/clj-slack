@@ -59,12 +59,10 @@
    (ZonedDateTime/ofInstant (ts->inst ts) UTC)
    zone-id))
 
-(def ts-regex #"(\d{10})\.(\d{6})")
-
 (defn ts->micros
   "If `s` is a ts string, converts it to Long. Else, returns nil."
   [s]
-  (when-let [[_ seconds micros] (re-find ts-regex s)]
+  (when-let [[_ seconds micros] (re-find #"(\d{10})\.(\d{6})" s)]
     (parse-long (str seconds micros))))
 
 (defn format-inst-id

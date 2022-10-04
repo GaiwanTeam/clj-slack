@@ -1,6 +1,5 @@
 (ns co.gaiwan.slack.domain.message
-  "Schema and logic for manipulating Message data"
-  (:require [co.gaiwan.slack.time-util :as time-util]))
+  "Schema and logic for manipulating Message data")
 
 (def ?Timestamp [:re #"\d{10}\.\d{6}"])
 
@@ -18,6 +17,12 @@
    [:message/image? {:optional true} boolean?]
    [:message/reactions {:optional true} [:map-of string? int?]]])
 
+(defn ts->micros
+  "If `s` is a ts string, converts it to Long. Else, returns nil."
+  [s]
+  (when-let [[_ seconds micros] (re-find #"(\d{10})\.(\d{6})" s)]
+    (parse-long (str seconds micros))))
+
 (defn reaction-count [{:message/keys [reactions]}]
   (reduce + (vals reactions)))
 
@@ -31,8 +36,10 @@
                                replies-factor 1}}]
   (let [reaction-count (reaction-count message)
         replies-count  (replies-count message)
-        micros-elapsed (- (time-util/ts->micros (:message/timestamp message))
-                          (* 1000 start-time-ms))
+        seconds-elapsed (/ (- (* 1000 start-time-ms)
+                              (ts->micros (:message/timestamp message)))
+                           1000)
         score          (+ (* reaction-count reaction-factor)
                           (* replies-count replies-factor))]
-    (/ score (Math/pow (inc micros-elapsed) exponent))))
+    (* 100000
+       (/ score (Math/pow (inc seconds-elapsed) exponent)))))

@@ -124,7 +124,8 @@
 
           (swap! sorted-events #(drop (count expired-events) %))
 
-          (doseq [e expired-events]
+          (doseq [e expired-events
+                  :let [e (offset-event e offset-us)]]
             (run! (fn [l] (l e)) (vals @listeners)))
 
           (when-let [remaining (seq @sorted-events)]
