@@ -150,6 +150,49 @@
     "channel" "C064BA6G2"
     "team" "T03RZGPFR"}])
 
+(def single-reply2
+  "A message and a (threaded) reply"
+  [{"event_ts" "1550832057.067300"
+    "ts" "1550832057.067300"
+    "user" "U82DUDVMH"
+    "client_msg_id" "79f99599-b72f-4b25-a6ba-2c7686f3600c"
+    "text" "/hat-tip"
+    "thread_ts" "1550831541.063800"
+    "type" "message"
+    "channel" "C064BA6G2"
+    "team" "T03RZGPFR"} 
+  {"event_ts" "1550832097.067300"
+    "ts" "1550832097.067300"
+    "user" "U82DUDVMH"
+    "client_msg_id" "79f99599-b72f-4b25-a6ba-2c7686f3600c"
+    "text" "/smile"
+    "thread_ts" "1550832057.067300"
+    "type" "message"
+    "channel" "C064BA6G2"
+    "team" "T03RZGPFR"}])
+   
+(def single-new-msg
+  {"event_ts"              "1550832097.067300"
+   "ts"                    "1550832097.067300"
+   "user"                  "U01UU0ELRM5"
+   "client_msg_id"         "54bb6fbb-1528-4381-a218-3796139a3144"
+   "blocks"                [{"block_id" "v9+e"
+                             "type"     "rich_text"
+                             "elements" [{"type"     "rich_text_section"
+                                          "elements" [{"text" "Thanks so, so much "
+                                                       "type" "text"}
+                                                      {"user_id" "UB5S3V9F0"
+                                                       "type"    "user"}
+                                                      {"text" "!! That was awesome"
+                                                       "type" "text"}]}]}]
+   "text"                  "This is my new cat, thank so much <@UB5S3V9F0>!!"
+   "suppress_notification" false
+   "source_team"           "TASMB716H"
+   "type"                  "message"
+   "channel"               "C015DQFEGMT"
+   "team"                  "TASMB716H"
+   "user_team"             "TASMB716H"})
+
 (def replies+broadcast
   [{"event_ts" "1614822402.022400"
     "ts" "1614822402.022400"
