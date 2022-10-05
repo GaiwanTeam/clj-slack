@@ -76,7 +76,7 @@
           (fn [channel]
             (apply f channel args))))
 
-(defn enrich-all [store]
+#_(defn enrich-all [store]
   (update-channels
    store
    (fn [channel]
@@ -88,7 +88,7 @@
                         :handlers (:workspace-store/markdown-handlers store)
                         :org-name (:workspace-store/workspace store)}))))))
 
-(defn enrich-entries [store message-ids]
+#_(defn enrich-entries [store message-ids]
   (update-channels
    store
    (fn [channel]
@@ -101,3 +101,37 @@
          {:users    (:workspace-store/users store)
           :handlers (:workspace-store/markdown-handlers store)
           :org-name (:workspace-store/workspace store)}))))))
+
+  ;; ------------------------------------------------
+
+(defn user-id-handler [[_ user-id] _]..)
+(defn emoji-handler [[_ code] _]..)
+(defn channel-handler [[_ channel-id channel-name]_]..)
+
+(defn markdown-handlers [store]
+  {:users    (:workspace-store/users store)
+   :handlers {:handlers {:user-id    user-id-handler
+                         :emoji      emoji-handler
+                         :channel-id channel-handler}}
+   :org-name (:workspace-store/workspace store)})
+
+(defn enrich-all [store]
+  (update-channels
+   store
+   (fn [channel]
+     (update
+      channel :channel/message-tree
+      (fn [message-tree]
+        (enrich/enrich message-tree markdown-handlers))))))
+
+(defn enrich-entries [store message-ids]
+  (update-channels
+   store
+   (fn [channel]
+     (update
+      channel :channel/message-tree
+      (fn [message-tree]
+        (enrich/enrich-entries
+         message-tree
+         message-ids
+         markdown-handlers))))))
