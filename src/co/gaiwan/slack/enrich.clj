@@ -47,8 +47,7 @@
         inst
         (assoc :message/time (time-util/format-inst-time inst))
         :->
-        (-> (dissoc :message/text)
-            (assoc :message/permalink (permalink org-name channel-id timestamp)
+        (-> (assoc :message/permalink (permalink org-name channel-id timestamp)
                    :channel/link (channel-link org-name channel-id)
                    :user-profile/link (user-profile-link org-name user-id)
                    :user-profile/display-name (actual-display-name message user))))
@@ -72,3 +71,14 @@
    (let [get-effected-messages-from-tree (fn [mt ts]
                                            (update mt ts #(enrich-message % opts)))]
      (reduce get-effected-messages-from-tree message-tree timestamps))))
+
+
+(comment
+  (markdown/markdown->hiccup "*hey* I :wink: am  <@U03280RER7B>"
+                             {:handlers
+                              {:emoji (fn [[_ emoji] _]
+                                        [:slack-widgets/emoji {:name emoji}])
+                               :user-id (fn [[_ user-id] _]
+                                          [:slack-widgets/user-mention {:id user-id}])}})
+  ;; ([:b "hey"] " I am  " [:span.username [:em "<" "U03280RER7B" ">"]])
+  )
