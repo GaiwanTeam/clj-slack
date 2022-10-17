@@ -16,16 +16,18 @@
   [:map
    [:workspace-store/workspace string?]
    [:workspace-store/markdown-handlers map?]
+   [:workspace-store/text-handlers {:optional true} map?]
    [:workspace-store/users [:map-of string? ?User]]
    [:workspace-store/emoji [:map-of string? string?]]
    [:workspace-store/channels [:map-of string? ?Channel]]])
 
-(defn new-store [{:keys [workspace markdown-handlers]}]
+(defn new-store [{:keys [workspace markdown-handlers text-handlers]}]
   {:workspace-store/users {}
    :workspace-store/emoji {}
    :workspace-store/channels {}
    :workspace-store/workspace workspace
-   :workspace-store/markdown-handlers markdown-handlers})
+   :workspace-store/markdown-handlers markdown-handlers
+   :workspace-store/text-handlers text-handlers})
 
 (defn channel-message-tree [store channel-id]
   (get-in store [:workspace-store/channels channel-id :channel/message-tree]))
@@ -84,9 +86,10 @@
       channel :channel/message-tree
       (fn [message-tree]
         (enrich/enrich message-tree
-                       {:users    (:workspace-store/users store)
-                        :handlers (:workspace-store/markdown-handlers store)
-                        :org-name (:workspace-store/workspace store)}))))))
+                       {:users         (:workspace-store/users store)
+                        :handlers      (:workspace-store/markdown-handlers store)
+                        :text-handlers (:workspace-store/text-handlers store)
+                        :org-name      (:workspace-store/workspace store)}))))))
 
 (defn enrich-entries [store message-ids]
   (update-channels
@@ -98,6 +101,7 @@
         (enrich/enrich-entries
          message-tree
          message-ids
-         {:users    (:workspace-store/users store)
-          :handlers (:workspace-store/markdown-handlers store)
-          :org-name (:workspace-store/workspace store)}))))))
+         {:users         (:workspace-store/users store)
+          :handlers      (:workspace-store/markdown-handlers store)
+          :text-handlers (:workspace-store/text-handlers store)
+          :org-name      (:workspace-store/workspace store)}))))))

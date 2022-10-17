@@ -3,7 +3,8 @@
   (:require [clojure.walk :as walk]
             [clojure.string :as str]
             [co.gaiwan.slack.time-util :as time-util]
-            [co.gaiwan.slack.markdown :as markdown]))
+            [co.gaiwan.slack.markdown :as markdown]
+            [co.gaiwan.slack.markdown.render-text :as render-text]))
 
 (defn channel-link [org-name channel-id]
   (str "https://" org-name ".slack.com/archives/" channel-id))
@@ -27,7 +28,7 @@
 
 (defn enrich-message
   ""
-  [message {:keys [users handlers user-keys org-name]
+  [message {:keys [users handlers text-handlers user-keys org-name]
             :or   {user-keys [:user-profile/image-48
                               :user/name
                               :user/real-name
@@ -42,10 +43,17 @@
       (cond-> message
         user
         (merge (select-keys user user-keys))
+
         (contains? message :message/text)
         (assoc :message/hiccup (markdown/markdown->hiccup (:message/text message) {:handlers handlers}))
+
+        (and text-handlers (contains? message :message/text))
+        (render-text/enrich-message (:user-id text-handlers)
+                                    (:channel-id text-handlers))
+
         inst
         (assoc :message/time (time-util/format-inst-time inst))
+
         :->
         (-> (assoc :message/permalink (permalink org-name channel-id timestamp)
                    :channel/link (channel-link org-name channel-id)
