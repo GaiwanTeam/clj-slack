@@ -5,6 +5,9 @@
 
 // You can parse the actual unicode code points out of the image file names.
 
+// Note: we're no longer using this, instead copy-paste the slack data directly
+// from slack's JS sources.
+
 var emojis={}
 
 function selectSkinTone(value) {

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Scrape all emoji skin tone unicode sequences, see markdown.clj
+
+{
+  curl -s https://unicode.org/Public/emoji/15.0/emoji-sequences.txt
+  curl -s https://unicode.org/Public/emoji/15.0/emoji-zwj-sequences.txt
+} | grep 'skin tone' \
+| sed -e 's/ *;.*//' -e 's/ /-/g' \
+| bb '(sort (str/split (str/lower-case (slurp *in*)) #"\n"))' \
+| jet --from edn --to json \
+| json_pp > resources/clj-slack/skin_tones.json
