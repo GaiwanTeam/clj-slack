@@ -11,7 +11,7 @@
   clojure.java-time/clojure.java-time {:mvn/version "1.1.0"}
 
   ;; Http/WS
-  hato/hato                         {:mvn/version "0.8.2"}
+  hato/hato                         {:mvn/version "0.9.0"}
   org.java-websocket/Java-WebSocket {:mvn/version "1.5.3"}
 
   ;; Logging
@@ -21,7 +21,7 @@
   org.slf4j/jul-to-slf4j         {:mvn/version "2.0.3"}
   org.slf4j/jcl-over-slf4j       {:mvn/version "2.0.3"}
   org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "2.0.3"}
-  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.4.1"}}
+  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.4.4"}}
 
  :aliases
  {:dev  {:extra-paths ["dev"]
