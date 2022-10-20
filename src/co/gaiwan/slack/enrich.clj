@@ -60,7 +60,7 @@
                    :user-profile/link (user-profile-link org-name user-id)
                    :user-profile/display-name (actual-display-name message user))))
       (catch Exception e
-        (prn message)
+        (prn "Error enriching" message)
         (throw e)))))
 
 (defn enrich

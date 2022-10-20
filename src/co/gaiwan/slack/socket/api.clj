@@ -5,10 +5,10 @@
 
   Main usage pattern, call `ws-connect` with a token, then register listeners.
   "
-  (:require [hato.client :as http]
-            [charred.api :as json]
-            [lambdaisland.glogc :as log]
-            [co.gaiwan.slack.protocols :as protocols])
+  (:require [charred.api :as json]
+            [co.gaiwan.slack.protocols :as protocols]
+            [hato.client :as http]
+            [lambdaisland.glogc :as log])
   (:import (java.io ByteArrayInputStream ByteArrayOutputStream)
            (java.net URI)
            (org.java_websocket.client WebSocketClient)))
@@ -70,7 +70,7 @@
                (meta []
                  opts))]
     ;; Disable ping/pong check, Slack does not seem to adhere to this
-    (.setConnectionLostTimeout conn 0)
+    ;; (.setConnectionLostTimeout conn 0)
     (when-not (.connectBlocking conn 2 java.util.concurrent.TimeUnit/SECONDS)
       (throw (ex-info "Failed connecting" {:uri uri})))
     conn))
@@ -139,7 +139,11 @@
                                                       :subtype "close"
                                                       :flags flags})
                                                  (vals @listeners))
-                                           (reconnect!))}))))))]
+                                           ;; Prevent an infinite reconnect loop
+                                           ;; when we close the connection
+                                           ;; ourselves
+                                           (when (:remote? flags)
+                                             (reconnect!)))}))))))]
     (reconnect!)
     (with-meta
       (reify java.io.Closeable
@@ -155,7 +159,11 @@
           (swap! listeners dissoc watch-key)))
       {:!conn !conn
        :listeners listeners
-       :token token})))
+       :token token
+       :reconnect! reconnect!})))
+
+(defn reconnect! [socket-conn]
+  ((:reconnect! (meta socket-conn))))
 
 (comment
   (def messages (atom []))
