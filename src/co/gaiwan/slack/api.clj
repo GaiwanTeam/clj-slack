@@ -1,10 +1,13 @@
 (ns co.gaiwan.slack.api
   "Request things from the Slack API"
-  (:require [lambdaisland.glogc :as log]
-            [co.gaiwan.slack.api.middleware :as mw]
-            [co.gaiwan.slack.api.web :as web]
-            [co.gaiwan.slack.domain.user :as domain-user]
-            [co.gaiwan.slack.domain.channel :as domain-channel]))
+  (:require
+   [lambdaisland.glogc :as log]
+   [charred.api :as charred]
+   [co.gaiwan.slack.api.middleware :as mw]
+   [co.gaiwan.slack.api.web :as web]
+   [co.gaiwan.slack.domain.user :as domain-user]
+   [co.gaiwan.slack.domain.channel :as domain-channel]
+   [hato.client :as hato]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
@@ -25,6 +28,19 @@
         (self connection {}))
        ([connection opt]
         (web/slack-request connection endpoint opt)))))))
+
+(defn post-endpoint [endpoint]
+  (fn [connection body]
+    (let [req {:oauth-token (:token connection)
+               :throw-exceptions? true
+               :body (charred/write-json-str body)
+               :content-type :json
+               :as :json}]
+      (log/info :request/starting {:url (str (:api-url connection) "/" endpoint) :req (dissoc req :body) :body body})
+      (let [resp
+            (hato/post (str (:api-url connection) "/" endpoint) req)]
+        (log/info :request/done (dissoc resp :request))
+        resp))))
 
 (defn collection-endpoint
   [key endpoint]

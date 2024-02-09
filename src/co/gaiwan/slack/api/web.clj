@@ -1,8 +1,9 @@
 (ns co.gaiwan.slack.api.web
-  (:require [charred.api :as json]
-            [lambdaisland.glogc :as log]
-            [hato.client :as http]
-            [lambdaisland.uri :as uri]))
+  (:require
+   [charred.api :as json]
+   [lambdaisland.glogc :as log]
+   [hato.client :as http]
+   [lambdaisland.uri :as uri]))
 
 (defn- verify-api-url!
   [connection]
