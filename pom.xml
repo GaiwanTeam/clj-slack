@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>co.gaiwan</groupId>
   <artifactId>clj-slack</artifactId>
-  <version>0.0.127</version>
+  <version>0.0.128</version>
   <name>clj-slack</name>
   <description></description>
-  <url>https://github.com/lambdaisland/clj-slack</url>
+  <url>https://github.com//clj-slack</url>
   <inceptionYear>2021</inceptionYear>
   <organization>
     <name>Lambda Island</name>
@@ -16,10 +16,10 @@
     <project class="build sourceEncoding">UTF-8</project>
   </properties>
   <scm>
-    <url>https://github.com/lambdaisland/clj-slack</url>
-    <connection>scm:git:git://github.com/lambdaisland/clj-slack.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/lambdaisland/clj-slack.git</developerConnection>
-    <tag>4144691924fb035647054bb0e458439df437e892</tag>
+    <url>https://github.com//clj-slack</url>
+    <connection>scm:git:git://github.com//clj-slack.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com//clj-slack.git</developerConnection>
+    <tag>fb1355fa2b4e204d0edd11edc7fcd169655a7f0b</tag>
   </scm>
   <dependencies>
     <dependency>
@@ -115,25 +115,11 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>4144691924fb035647054bb0e458439df437e892</git-revision>
+              <git-revision>fb1355fa2b4e204d0edd11edc7fcd169655a7f0b</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
       </plugin>
-      <!-- <plugin> -->
-      <!--   <groupId>org.apache.maven.plugins</groupId> -->
-      <!--   <artifactId>maven-gpg-plugin</artifactId> -->
-      <!--   <version>1.6</version> -->
-      <!--   <executions> -->
-      <!--     <execution> -->
-      <!--       <id>sign-artifacts</id> -->
-      <!--       <phase>verify</phase> -->
-      <!--       <goals> -->
-      <!--         <goal>sign</goal> -->
-      <!--       </goals> -->
-      <!--     </execution> -->
-      <!--   </executions> -->
-      <!-- </plugin> -->
     </plugins>
   </build>
   <repositories>

@@ -4,9 +4,10 @@
   (:require [lioss.main :as lioss]))
 
 (lioss/main
- {:inception-year    2021
-  :description       ""
-  :group-id          "co.gaiwan"})
+ {:inception-year  2021
+  :description     ""
+  :group-id        "co.gaiwan"
+  :disable-signing true})
 
 ;; Local Variables:
 ;; mode:clojure
