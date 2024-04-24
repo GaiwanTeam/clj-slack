@@ -44,9 +44,13 @@
 (defn add-emoji [store emoji]
   (update store :workspace-store/emoji into emoji))
 
+(defn init-channel [store channel-id]
+  (assoc-in store [:workspace-store/channels channel-id :channel/message-tree] {}))
+
 (defn add-channel-event [store channel-id event]
-  (update-in store [:workspace-store/channels channel-id :channel/message-tree]
-             normalize-messages/add-event event))
+  (when (channel-message-tree store channel-id)
+    (update-in store [:workspace-store/channels channel-id :channel/message-tree]
+               normalize-messages/add-event event)))
 
 (defn add-channel-events [store channel-id events]
   ;; When events come from the history API they are missing the channel value
