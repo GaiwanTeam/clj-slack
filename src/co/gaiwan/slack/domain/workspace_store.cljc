@@ -48,9 +48,10 @@
   (assoc-in store [:workspace-store/channels channel-id :channel/message-tree] {}))
 
 (defn add-channel-event [store channel-id event]
-  (when (channel-message-tree store channel-id)
+  (if (channel-message-tree store channel-id)
     (update-in store [:workspace-store/channels channel-id :channel/message-tree]
-               normalize-messages/add-event event)))
+               normalize-messages/add-event event)
+    store))
 
 (defn add-channel-events [store channel-id events]
   ;; When events come from the history API they are missing the channel value
