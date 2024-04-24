@@ -36,13 +36,13 @@
   (into {} (map (juxt k identity)) coll))
 
 (defn add-users [store users]
-  (update store :workspace-store/users into (index-by :user/id users)))
+  (update store :workspace-store/users (fnil into {}) (index-by :user/id users)))
 
 (defn add-channels [store channels]
-  (update store :workspace-store/channels into (index-by :channel/id channels)))
+  (update store :workspace-store/channels (fnil into {}) (index-by :channel/id channels)))
 
 (defn add-emoji [store emoji]
-  (update store :workspace-store/emoji into emoji))
+  (update store :workspace-store/emoji (fnil into {}) emoji))
 
 (defn init-channel [store channel-id]
   (assoc-in store [:workspace-store/channels channel-id :channel/message-tree] {}))
