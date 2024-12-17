@@ -8,9 +8,10 @@
 
   clj -X:run/backfill :token '\"xoxb-....\"' :output-dir '\"/tmp/backfill\"'
   "
-  (:require [co.gaiwan.slack.api :as api]
-            [clojure.java.io :as io]
-            [charred.api :as json]))
+  (:require
+   [co.gaiwan.slack.api :as api]
+   [clojure.java.io :as io]
+   [charred.api :as json]))
 
 (defn fetch-logs [conn target-dir]
   (doseq [{:keys [name id] :as channel} (api/conversations conn)]

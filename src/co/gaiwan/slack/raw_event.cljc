@@ -102,6 +102,7 @@
 
 (defn channel-id
   "Get the channel this message applies to, if any."
-  [{:strs [channel item]}]
+  [{:strs [channel channel_id item]}]
   (or channel
+      channel_id
       (get item "channel")))
