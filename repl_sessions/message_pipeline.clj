@@ -1,7 +1,8 @@
 (ns repl-sessions.message-pipeline
-  (:require [clojure.java.io :as io]
-            [co.gaiwan.slack.raw-archive :as raw]
-            [co.gaiwan.slack.archive :as archive]))
+  (:require
+   [clojure.java.io :as io]
+   [co.gaiwan.slack.raw-archive :as raw]
+   [co.gaiwan.slack.archive :as archive]))
 
 
 (def cljians-log-dir "/path/to/clojurians-log/logs")

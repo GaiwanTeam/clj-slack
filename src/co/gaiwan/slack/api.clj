@@ -1,13 +1,13 @@
 (ns co.gaiwan.slack.api
   "Request things from the Slack API"
   (:require
-   [lambdaisland.glogc :as log]
    [charred.api :as charred]
    [co.gaiwan.slack.api.middleware :as mw]
    [co.gaiwan.slack.api.web :as web]
-   [co.gaiwan.slack.domain.user :as domain-user]
    [co.gaiwan.slack.domain.channel :as domain-channel]
-   [hato.client :as hato]))
+   [co.gaiwan.slack.domain.user :as domain-user]
+   [hato.client :as hato]
+   [lambdaisland.glogc :as log]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Slack API functions
