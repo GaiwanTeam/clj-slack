@@ -1,47 +1,68 @@
 (ns co.gaiwan.slack.archive
   "Working with an archive as a set of files, partitioned by channel and day.
 
-  A Archive in this sense is a directory containing per-channel folders, which
-  contain per-day json-lines files, with Slack events pre-filtered and
-  partitioned, so everything related to a given day is available in one file. It
-  also contains top-level jsonl files for the slack workspace's users, channels,
-  and emoji
+  A Archive in this sense is a directory containing top-level folders for each
+  part of the archive, each of which contains per-channel folders, which contain
+  per-day json-lines files, with Slack events pre-filtered and partitioned, so
+  everything related to a given day is available in one file. It also contains
+  top-level jsonl files for the slack workspace's users, channels, and emoji.
+
+  When a Channel/Day is requested, each \"part\" is checked, and any jsonl files
+  found in different parts are combined. This makes it easy to simply drop in
+  individual exports of specific date ranges, together with the output directory
+  of slack-event-sink.
 
   ```
   ├── users.jsonl
   ├── channels.jsonl
   ├── emoji.jsonl
-  ├── GQ54T7CCX
-  │   └── 2020-06-16.jsonl
-  └── GQ6JA3UBF
-      ├── 2019-11-05.jsonl
-      ├── 2020-05-29.jsonl
-      └── 2020-06-23.jsonl
+  ├── logbot
+  │   └── GQ54T7CCX
+  │       └── 2020-06-16.jsonl
+  └── export-2024-10
+      └── GQ54T7CCX
+          ├── 2019-11-05.jsonl
+          ├── 2020-05-29.jsonl
+          └── 2020-06-23.jsonl
   ```
 
   When working with such an archive we have a `{:dir \"archive-directory\"}` map
   called arch, which may also contain other things to help incrementally
   construct the archive."
-  (:require [clojure.java.io :as io]
-            [co.gaiwan.json-lines :as jsonl]
-            [co.gaiwan.slack.archive.api-resources :as api-resources]
-            [co.gaiwan.slack.archive.partition :as partition]
-            [co.gaiwan.slack.raw-archive :as raw-archive])
-  (:import (java.time ZoneId)))
+  (:require
+   [clojure.java.io :as io]
+   [co.gaiwan.json-lines :as jsonl]
+   [co.gaiwan.slack.archive.api-resources :as api-resources]
+   [co.gaiwan.slack.archive.partition :as partition]
+   [co.gaiwan.slack.raw-archive :as raw-archive])
+  (:import
+   (java.io File)
+   (java.time ZoneId)))
 
 (defn archive
   "Create a new map identifying the archive.
 
   This value is passed through operations which may add extra stuff to it. "
   ([root-dir]
-   {:dir root-dir}))
+   (let [root (io/file root-dir)]
+     (.mkdirs root)
+     {:dir root
+      :default-part "default"})))
+
+(defn parts [{:keys [dir] :as archive}]
+  (filter File/.isDirectory (.listFiles dir)))
+
+(defn slurp-jsonl [f]
+  (when (.exists f)
+    (jsonl/slurp-jsonl f)))
 
 (defn slurp-chan-day-raw
   "Get the raw list of events for a given channel and day"
   [arch channel-id day-str]
-  (let [f (partition/chan-day-file (:dir arch) channel-id day-str)]
-    (when (.exists f)
-      (jsonl/slurp-jsonl f))))
+  (mapcat (fn [p]
+            (slurp-jsonl
+             (partition/chan-day-file p channel-id day-str)))
+          (parts arch)))
 
 (defn load-api-resources
   "Load the channel, user, and emoji data stored at the top level of the archive

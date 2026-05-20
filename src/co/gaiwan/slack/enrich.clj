@@ -1,10 +1,11 @@
 (ns co.gaiwan.slack.enrich
   "Take message data, combine it with user and channel info, and parse the markdown."
-  (:require [clojure.walk :as walk]
-            [clojure.string :as str]
-            [co.gaiwan.slack.time-util :as time-util]
-            [co.gaiwan.slack.markdown :as markdown]
-            [co.gaiwan.slack.markdown.render-text :as render-text]))
+  (:require
+   [clojure.walk :as walk]
+   [clojure.string :as str]
+   [co.gaiwan.slack.time-util :as time-util]
+   [co.gaiwan.slack.markdown :as markdown]
+   [co.gaiwan.slack.markdown.render-text :as render-text]))
 
 (defn channel-link [org-name channel-id]
   (str "https://" org-name ".slack.com/archives/" channel-id))

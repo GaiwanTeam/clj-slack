@@ -19,8 +19,8 @@
 
   Keeps open writers under the `:writers` key inside the arch map and reuses
   them, see [[close-writers]] for cleaning up when you're done."
-  [{:keys [dir zone-id] :as arch} channel day-str]
-  (let [file (chan-day-file dir channel day-str)]
+  [{:keys [dir zone-id default-part] :as arch} channel day-str]
+  (let [file (chan-day-file (io/file dir default-part) channel day-str)]
     (if-let [writer (get-in arch [:writers channel day-str])]
       [writer arch]
       (do

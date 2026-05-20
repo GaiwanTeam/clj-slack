@@ -1,16 +1,19 @@
 (ns co.gaiwan.slack.domain.workspace-store
   "Schema and logic for manipulating a workspace-store
 
-  A workspace-store contains data about a complete workspace
+  A workspace-store is an in-memory repository of slack history. It contains
+  data about a complete workspace.
+
   - users
   - custom emoji
   - channels, optionally including message history
   "
-  (:require [co.gaiwan.slack.domain.user :refer [?User]]
-            [co.gaiwan.slack.domain.channel :refer [?Channel]]
-            [co.gaiwan.slack.raw-event :as raw-event]
-            [co.gaiwan.slack.normalize.messages :as normalize-messages]
-            [co.gaiwan.slack.enrich :as enrich]))
+  (:require
+   [co.gaiwan.slack.domain.user :refer [?User]]
+   [co.gaiwan.slack.domain.channel :refer [?Channel]]
+   [co.gaiwan.slack.raw-event :as raw-event]
+   [co.gaiwan.slack.normalize.messages :as normalize-messages]
+   [co.gaiwan.slack.enrich :as enrich]))
 
 (def ?WorkspaceStore
   [:map
