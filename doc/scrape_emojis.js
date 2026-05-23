@@ -29,7 +29,7 @@ function simulateMouseClick(selector) {
 }
 
 function isDone () {
-    return (picker_list.offsetHeight + picker_list.scrollTop >= picker_list.scrollHeight);
+  return (picker_list.offsetHeight + picker_list.scrollTop + 1 >= picker_list.scrollHeight);
 }
 
 function collectMore() {
@@ -57,7 +57,7 @@ function download(filename, text) {
 
 var skinTone = 1;
 
-simulateMouseClick('[data-qa="texty_emoji_button"]');
+simulateMouseClick('[data-qa="emoji_toolbar_button"]');
 
 var picker_list = document.getElementById('emoji-picker-list');
 picker_list.scrollTo(0, 0);
