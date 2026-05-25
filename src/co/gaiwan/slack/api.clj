@@ -32,7 +32,8 @@
 (defn post-endpoint [endpoint]
   (fn [connection body]
     (let [req {:oauth-token (:token connection)
-               :throw-exceptions? true
+               ;; Rate limit middleware counts on this being
+               :throw-exceptions? false
                :body (charred/write-json-str body)
                :content-type :json
                :as :json}]
