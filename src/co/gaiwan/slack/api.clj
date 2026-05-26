@@ -59,6 +59,14 @@
 (def conversations* (collection-endpoint :channels "conversations.list"))
 (def conversations (mw/wrap-coerce conversations* domain-channel/raw->channel))
 
+(def user-conversations*
+  "Channel the current user/bot is in, uncoerced"
+  (collection-endpoint :channels "users.conversations"))
+
+(def user-conversations
+  "Channel the current user/bot is in"
+  (mw/wrap-coerce user-conversations* domain-channel/raw->channel))
+
 (def history
   "(history conn {:channel channel-id})"
   (collection-endpoint :messages "conversations.history"))

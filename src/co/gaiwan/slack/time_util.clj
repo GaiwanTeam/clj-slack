@@ -11,11 +11,13 @@
   event/message was sent. In that case we typically first convert to
   `java.time.Instant` (see [[ts->inst]]), then use java-time
   formatters to format to human readable strings."
-  (:require [java-time :as jt]
-            [java-time.local :as jt.l]
-            [clojure.string :as str])
-  (:import (java.time Instant LocalDate ZonedDateTime ZoneId)
-           (java.time.format DateTimeFormatter)))
+  (:require
+   [clojure.string :as str]
+   [java-time :as jt]
+   [java-time.local :as jt.l])
+  (:import
+   (java.time Instant LocalDate ZonedDateTime ZoneId)
+   (java.time.format DateTimeFormatter)))
 
 (def ^ZoneId UTC (ZoneId/of "UTC"))
 (def ^DateTimeFormatter inst-id-formatter
