@@ -11,7 +11,10 @@
   don't generally have a `ts`. There are some exceptions for connect/disconnect
   messages, for those [[event-ts]] returns `nil`"
   [e]
-  (get e "event_ts" (get e "ts")))
+  (or
+   (get e "event_ts")
+   (get e "ts")
+   (get-in e ["event" "event_ts"])))
 
 (defn message-ts
   "Which message does this event pertain to? This differs from message type to
@@ -27,7 +30,7 @@
   - message_changed : the message that was edited
   - pin_added / removed: the message that was pinned
   "
-  [{:strs [type subtype ts event_ts item message deleted_ts]}]
+  [{:strs [type subtype ts event_ts item message deleted_ts event]}]
   (case type
     "reaction_added"
     (get item "ts")
@@ -46,6 +49,8 @@
       ts)
     "file_shared"
     event_ts
+    "event_callback"
+    (get event "event_ts")
     (or ts event_ts)))
 
 (defn parent-ts
