@@ -4,11 +4,12 @@
   implementations for the different types of elements. If you need specific
   handling, e.g. for username rendering, then you pass in context-specific
   handlers."
-  (:require [co.gaiwan.slack.markdown.parser :as parser]
-            [clojure.string :as str]
-            [clojure.walk :as walk]
-            [clojure.java.io :as io]
-            [charred.api :as json]))
+  (:require
+   [co.gaiwan.slack.markdown.parser :as parser]
+   [clojure.string :as str]
+   [clojure.walk :as walk]
+   [clojure.java.io :as io]
+   [charred.api :as json]))
 
 (defn hex->char
   "Take a string of unicode characters specified in hexadecimal with dashes, and

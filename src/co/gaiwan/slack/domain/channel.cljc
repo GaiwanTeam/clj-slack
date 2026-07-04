@@ -10,8 +10,10 @@
    [:channel/creator-id string?]
    [:channel/message-tree {:optional true} [:map-of string? ?Message]]])
 
-(defn raw->channel [{:strs [id name created creator]}]
+(defn raw->channel [{:strs [id name created creator purpose topic]}]
   {:channel/id id
    :channel/name name
    :channel/created created
-   :channel/creator-id creator})
+   :channel/creator-id creator
+   :channel/topic (get topic "value")
+   :channel/purpose (get purpose "value")})
