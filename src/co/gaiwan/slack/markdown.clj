@@ -140,7 +140,12 @@
     segments))
 
 (defmethod segment->hiccup :default [[_ content] handlers]
-  content)
+  (if (coll? content)
+    (segments->hiccup content handlers)
+    content))
+
+(defmethod segment->hiccup :blockquote [[_ content] handlers]
+  [:blockquote (segments->hiccup content handlers)])
 
 (defmethod segment->hiccup :code-block [[_ content] handlers]
   [:pre.highlight [:code [:lambdaisland.hiccup/unsafe-html content]]])

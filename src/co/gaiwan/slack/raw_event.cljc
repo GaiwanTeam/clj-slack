@@ -30,7 +30,7 @@
   - message_changed : the message that was edited
   - pin_added / removed: the message that was pinned
   "
-  [{:strs [type subtype ts event_ts item message deleted_ts event]}]
+  [{:strs [type subtype ts event_ts item message deleted_ts event event_time]}]
   (case type
     "reaction_added"
     (get item "ts")
@@ -51,7 +51,7 @@
     event_ts
     "event_callback"
     (get event "event_ts")
-    (or ts event_ts)))
+    (or ts event_ts event_time)))
 
 (defn parent-ts
   "Get the timestamp of the message that this is a reply to. Returns nil if it's
