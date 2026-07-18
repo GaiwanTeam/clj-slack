@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lambdaisland</groupId>
   <artifactId>clj-slack</artifactId>
-  <version>0.2.147</version>
+  <version>0.3.150</version>
   <name>clj-slack</name>
   <description>Slack toolbox</description>
   <url>https://github.com/GaiwanTeam/clj-slack</url>
@@ -25,7 +25,7 @@
     <url>https://github.com/GaiwanTeam/clj-slack</url>
     <connection>scm:git:git://github.com/GaiwanTeam/clj-slack.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/GaiwanTeam/clj-slack.git</developerConnection>
-    <tag>44e944cd412fd5c9fdce985f068597144890b21f</tag>
+    <tag>449ce2258fe44dfb5f5e98d67596ea8b32834081</tag>
   </scm>
   <dependencies>
     <dependency>
@@ -39,11 +39,6 @@
       <version>1.4.177</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>2.0.18</version>
-    </dependency>
-    <dependency>
       <groupId>io.pedestal</groupId>
       <artifactId>pedestal.log</artifactId>
       <version>0.8.1</version>
@@ -52,11 +47,6 @@
       <groupId>hato</groupId>
       <artifactId>hato</artifactId>
       <version>1.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>2.0.18</version>
     </dependency>
     <dependency>
       <groupId>clojure.java-time</groupId>
@@ -93,16 +83,6 @@
       <artifactId>charred</artifactId>
       <version>1.041</version>
     </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.5.38</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <version>2.0.18</version>
-    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -131,7 +111,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>44e944cd412fd5c9fdce985f068597144890b21f</git-revision>
+              <git-revision>449ce2258fe44dfb5f5e98d67596ea8b32834081</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
