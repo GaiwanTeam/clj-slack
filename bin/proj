@@ -4,10 +4,10 @@
   (:require [lioss.main :as lioss]))
 
 (lioss/main
- {:inception-year  2021
-  :description     ""
-  :group-id        "co.gaiwan"
-  :disable-signing true})
+ {:license        :epl
+  :inception-year 2021
+  :description    "Slack toolbox"
+  :group-id       "com.lambdaisland"})
 
 ;; Local Variables:
 ;; mode:clojure
