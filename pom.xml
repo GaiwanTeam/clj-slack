@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lambdaisland</groupId>
   <artifactId>clj-slack</artifactId>
-  <version>0.1.144</version>
+  <version>0.2.147</version>
   <name>clj-slack</name>
   <description>Slack toolbox</description>
   <url>https://github.com/GaiwanTeam/clj-slack</url>
@@ -25,7 +25,7 @@
     <url>https://github.com/GaiwanTeam/clj-slack</url>
     <connection>scm:git:git://github.com/GaiwanTeam/clj-slack.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/GaiwanTeam/clj-slack.git</developerConnection>
-    <tag>ebb8d20bbb12d59b5e53600a69b4a921a59f5739</tag>
+    <tag>44e944cd412fd5c9fdce985f068597144890b21f</tag>
   </scm>
   <dependencies>
     <dependency>
@@ -71,12 +71,12 @@
     <dependency>
       <groupId>com.lambdaisland</groupId>
       <artifactId>config</artifactId>
-      <version>0.10.37</version>
+      <version>0.15.56</version>
     </dependency>
     <dependency>
       <groupId>com.lambdaisland</groupId>
       <artifactId>cli</artifactId>
-      <version>1.29.127</version>
+      <version>1.30.130</version>
     </dependency>
     <dependency>
       <groupId>metosin</groupId>
@@ -91,12 +91,12 @@
     <dependency>
       <groupId>com.cnuernber</groupId>
       <artifactId>charred</artifactId>
-      <version>1.038</version>
+      <version>1.041</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.32</version>
+      <version>1.5.38</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -131,7 +131,7 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <git-revision>ebb8d20bbb12d59b5e53600a69b4a921a59f5739</git-revision>
+              <git-revision>44e944cd412fd5c9fdce985f068597144890b21f</git-revision>
             </manifestEntries>
           </archive>
         </configuration>
