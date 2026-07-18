@@ -18,11 +18,6 @@
   io.pedestal/pedestal.log {:mvn/version "0.8.1"}
   com.lambdaisland/glogi   {:mvn/version "1.4.177"}
 
-  org.slf4j/jul-to-slf4j         {:mvn/version "2.0.18"}
-  org.slf4j/jcl-over-slf4j       {:mvn/version "2.0.18"}
-  org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "2.0.18"}
-  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.5.38"}
-
   com.lambdaisland/cli     {:mvn/version "1.30.130"}
   com.lambdaisland/config  {:mvn/version "0.15.56"}
   }
