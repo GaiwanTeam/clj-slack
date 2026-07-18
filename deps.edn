@@ -5,7 +5,7 @@
   ;; Data formats
   metosin/jsonista      {:mvn/version "1.0.0"}
   lambdaisland/uri      {:mvn/version "1.19.155"}
-  com.cnuernber/charred {:mvn/version "1.038"}
+  com.cnuernber/charred {:mvn/version "1.041"}
 
   ;; Time
   clojure.java-time/clojure.java-time {:mvn/version "1.4.3"}
@@ -21,17 +21,17 @@
   org.slf4j/jul-to-slf4j         {:mvn/version "2.0.18"}
   org.slf4j/jcl-over-slf4j       {:mvn/version "2.0.18"}
   org.slf4j/log4j-over-slf4j     {:exclusions [org.slf4j/slf4j-nop], :mvn/version "2.0.18"}
-  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.5.32"}
+  ch.qos.logback/logback-classic {:exclusions [org.slf4j/slf4j-api org.slf4j/slf4j-nop] :mvn/version "1.5.38"}
 
-  com.lambdaisland/cli     {:mvn/version "1.29.127"}
-  com.lambdaisland/config  {:mvn/version "0.10.37"}
+  com.lambdaisland/cli     {:mvn/version "1.30.130"}
+  com.lambdaisland/config  {:mvn/version "0.15.56"}
   }
 
  :aliases
  {:dev  {:extra-paths ["dev"]
-         :extra-deps  {com.lambdaisland/classpath  {:mvn/version "0.6.58"}
+         :extra-deps  {com.lambdaisland/classpath  {:mvn/version "0.8.70"}
                        io.github.nextjournal/clerk {:mvn/version "0.18.1158"}
-                       djblue/portal               {:mvn/version "0.64.1"}}}
+                       djblue/portal               {:mvn/version "0.67.0"}}}
   :test {:extra-paths ["test"]
          :extra-deps  {lambdaisland/kaocha {:mvn/version "1.91.1392"}}}
 
